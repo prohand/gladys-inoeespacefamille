@@ -58,13 +58,13 @@ Ein Gerät mit dem Namen der Einrichtung (und Ihrer Familie):
 
 Ein Gerät pro Kind („Léa – iNoé“):
 
-| Funktion          | Wert                                                         |
-| ----------------- | ------------------------------------------------------------ |
-| Booked today      | 1, wenn das Kind heute mindestens eine Buchung hat, sonst 0  |
-| Booked tomorrow   | 1, wenn das Kind morgen mindestens eine Buchung hat, sonst 0 |
-| Today             | Die heute gebuchten Aktivitäten („Cantine, Garderie soir“)   |
-| Tomorrow          | Die morgen gebuchten Aktivitäten                             |
-| Days booked ahead | Anzahl der gebuchten Tage im gelesenen Zeitraum              |
+| Funktion          | Wert                                                                              |
+| ----------------- | --------------------------------------------------------------------------------- |
+| Booked today      | 1, wenn das Kind heute mindestens eine Buchung hat, sonst 0                       |
+| Booked tomorrow   | 1, wenn das Kind morgen mindestens eine Buchung hat, sonst 0                      |
+| Today             | Die heute gebuchten Aktivitäten („Accueil de loisirs : Matin, Repas, Après-midi“) |
+| Tomorrow          | Die morgen gebuchten Aktivitäten                                                  |
+| Days booked ahead | Anzahl der gebuchten Tage im gelesenen Zeitraum                                   |
 
 Eine Abwesenheit oder ein Wartelistenplatz zählt nicht als Buchung.
 

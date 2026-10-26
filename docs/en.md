@@ -59,13 +59,13 @@ One device named after the structure (and your family):
 
 One device per child ("Léa – iNoé"):
 
-| Feature           | Value                                                      |
-| ----------------- | ---------------------------------------------------------- |
-| Booked today      | 1 when the child has at least one booking today, else 0    |
-| Booked tomorrow   | 1 when the child has at least one booking tomorrow, else 0 |
-| Today             | The activities booked today ("Cantine, Garderie soir")     |
-| Tomorrow          | The activities booked tomorrow                             |
-| Days booked ahead | Number of days booked over the period read                 |
+| Feature           | Value                                                                         |
+| ----------------- | ----------------------------------------------------------------------------- |
+| Booked today      | 1 when the child has at least one booking today, else 0                       |
+| Booked tomorrow   | 1 when the child has at least one booking tomorrow, else 0                    |
+| Today             | The activities booked today ("Accueil de loisirs : Matin, Repas, Après-midi") |
+| Tomorrow          | The activities booked tomorrow                                                |
+| Days booked ahead | Number of days booked over the period read                                    |
 
 An absence or a place on a waiting list does not count as a booking.
 

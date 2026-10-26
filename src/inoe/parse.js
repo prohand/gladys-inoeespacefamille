@@ -148,43 +148,129 @@ export function isBooked(event) {
   return PRESENT_WORDS.includes(String(presence).trim().toLowerCase());
 }
 
-/** The activity names of the planning, by activity id. */
-export function activityNames(slots) {
-  const names = new Map();
-  for (const slot of Array.isArray(slots) ? slots : []) {
-    const id = slot?.idActivite;
-    const name = String(slot?.intitule ?? slot?.abreviation ?? '').trim();
-    if (id !== undefined && id !== null && name && !names.has(String(id))) {
-      names.set(String(id), name);
+/**
+ * The rows of the planning, as the portal's calendar draws them: one row per
+ * slot of an activity (Morning, Lunch, Afternoon...), keyed like the calendar
+ * matches an event to its row — activity, slot and tariff.
+ *
+ * `periodeIntitule` names the activity (the calendar's group header) and
+ * `abreviation` the slot (the row label); `intitule` is the fallback of both.
+ * The order is the portal's: the rows come sorted as the calendar shows them.
+ */
+export function planningRows(slots) {
+  const rows = new Map();
+  (Array.isArray(slots) ? slots : []).forEach((slot, order) => {
+    const activity = String(slot?.periodeIntitule ?? '').trim();
+    const name = String(slot?.abreviation || slot?.intitule || '').trim();
+    const row = { activity, slot: name, order };
+    const keys = [
+      rowKey(slot?.idActivite, slot?.plageFonctionnementId, slot?.tarifId),
+      rowKey(slot?.idActivite, slot?.plageFonctionnementId),
+      rowKey(slot?.idActivite),
+    ];
+    for (const key of keys) {
+      if (!rows.has(key)) {
+        rows.set(key, row);
+      }
     }
+  });
+  return rows;
+}
+
+function rowKey(...ids) {
+  return ids.map((id) => (id === undefined || id === null ? '' : String(id))).join('|');
+}
+
+/** The row of an event: its exact slot, else what is known of its activity. */
+function rowOf(rows, event) {
+  const exact =
+    rows.get(rowKey(event.idActivite, event.plageFonctionnement_id, event.tarif_id)) ??
+    rows.get(rowKey(event.idActivite, event.plageFonctionnement_id));
+  if (exact) {
+    return exact;
   }
-  return names;
+  // A slot the planning does not list: name the activity, never the first
+  // slot of the activity (that read a full day as "Morning").
+  const anyRow = rows.get(rowKey(event.idActivite));
+  if (anyRow?.activity) {
+    return { activity: anyRow.activity, slot: '', order: anyRow.order };
+  }
+  return { activity: '', slot: `#${event.idActivite}`, order: Infinity };
 }
 
 /**
- * The bookings of one child, day by day.
+ * @typedef {{ activity: string, slot: string, order: number }} Booking
+ * One slot booked: "Accueil de loisirs" / "Matin".
+ */
+
+/** The key a booking is remembered and compared by. */
+export function bookingKey(booking) {
+  return `${booking.activity}|${booking.slot}`;
+}
+
+/**
+ * The bookings of one child, day by day: every slot booked, in the order of
+ * the portal's calendar. A full day reads as all its slots (morning, lunch,
+ * afternoon), never as the first one alone.
  * @param {{ events: object[], slots: object[] }} planning
- * @returns {Map<string, string[]>} day (YYYY-MM-DD) -> activity names booked
+ * @returns {Map<string, Booking[]>} day (YYYY-MM-DD) -> slots booked
  */
 export function bookingsByDay({ events, slots }) {
-  const names = activityNames(slots);
+  const rows = planningRows(slots);
   const days = new Map();
   for (const event of Array.isArray(events) ? events : []) {
     const day = parseDay(event?.date);
     if (!day || !isBooked(event)) {
       continue;
     }
-    const name = names.get(String(event.idActivite)) ?? `#${event.idActivite}`;
+    const { activity, slot, order } = rowOf(rows, event);
+    const booking = { activity, slot, order };
     const list = days.get(day) ?? [];
-    if (!list.includes(name)) {
-      list.push(name);
+    if (!list.some((other) => bookingKey(other) === bookingKey(booking))) {
+      list.push(booking);
     }
     days.set(
       day,
-      list.sort((a, b) => a.localeCompare(b)),
+      list.sort((a, b) => a.order - b.order || bookingKey(a).localeCompare(bookingKey(b))),
     );
   }
   return days;
+}
+
+/**
+ * The bookings of a day in full: "Accueil de loisirs : Matin, Repas,
+ * Après-midi · Garderie : Soir". "-" when there is none.
+ * @param {Booking[]} bookings
+ */
+export function describeBookings(bookings) {
+  if (!bookings || bookings.length === 0) {
+    return '-';
+  }
+  const groups = new Map();
+  for (const { activity, slot } of bookings) {
+    const list = groups.get(activity) ?? [];
+    if (slot) {
+      list.push(slot);
+    }
+    groups.set(activity, list);
+  }
+  return [...groups.entries()]
+    .map(([activity, list]) => {
+      if (!activity) {
+        return list.join(', ');
+      }
+      return list.length > 0 ? `${activity} : ${list.join(', ')}` : activity;
+    })
+    .join(' · ');
+}
+
+/** The slots of a day alone, for a narrow place: "Matin, Repas, Après-midi". */
+export function compactBookings(bookings) {
+  if (!bookings || bookings.length === 0) {
+    return '';
+  }
+  const names = bookings.map(({ activity, slot }) => slot || activity);
+  return [...new Set(names)].join(', ');
 }
 
 /** One message of the structure's news feed. */

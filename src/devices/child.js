@@ -15,6 +15,7 @@ import {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
 } from '@gladysassistant/integration-sdk';
+import { describeBookings } from '../inoe/parse.js';
 
 export const DEVICE_TYPE = 'child';
 
@@ -82,9 +83,9 @@ export function buildChildDevice(gladys, snapshot, child) {
   };
 }
 
-/** The activities of a day as one line, "-" for none. */
-export function activitiesText(activities) {
-  return activities.length > 0 ? activities.join(', ') : '-';
+/** The bookings of a day as one line, "-" for none. */
+export function activitiesText(bookings) {
+  return describeBookings(bookings);
 }
 
 export function childStates(gladys, snapshot, child) {

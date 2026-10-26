@@ -13,11 +13,16 @@
 // -----------------------------------------------------------------------------
 
 import { BOOKING_CHANGES, SCENE_TRIGGERS } from '../capabilities/keys.js';
-import { daysBetween } from './parse.js';
+import { bookingKey, daysBetween, describeBookings } from './parse.js';
 
 // Ids kept per list: far more than a family ever has open at once, and a
 // bound on what the memory file can grow to.
 const MAX_IDS = 500;
+
+// The format of the remembered bookings. A memory of another format (an
+// earlier version kept activity names, not slots) is not compared: its
+// differences would all be false "booked" / "cancelled" events.
+const BOOKINGS_FORMAT = 2;
 
 /** The memory to keep after a snapshot, given the one before. */
 export function memoryFrom(snapshot, previous, reminded = []) {
@@ -39,10 +44,17 @@ export function memoryFrom(snapshot, previous, reminded = []) {
         : [...(previous?.news ?? []), ...snapshot.news.map((message) => message.id)],
     ),
     window: snapshot.window,
+    bookingsFormat: BOOKINGS_FORMAT,
     bookings: Object.fromEntries(
       snapshot.children.map((child) => [
         child.id,
-        child.planningRead ? child.days : (previous?.bookings?.[child.id] ?? {}),
+        child.planningRead
+          ? Object.fromEntries(
+              Object.entries(child.days).map(([day, bookings]) => [day, bookings.map(bookingKey)]),
+            )
+          : previous?.bookingsFormat === BOOKINGS_FORMAT
+            ? (previous?.bookings?.[child.id] ?? {})
+            : {},
       ]),
     ),
   };
@@ -105,17 +117,25 @@ export function detectChanges(previous, snapshot, config, deviceOf) {
 
   for (const child of snapshot.children) {
     const before = previous.bookings?.[child.id];
-    if (!child.planningRead || !before) {
+    if (!child.planningRead || !before || previous.bookingsFormat !== BOOKINGS_FORMAT) {
       continue;
     }
     for (const day of daysToCompare(previous.window, snapshot.window)) {
       const was = before[day] ?? [];
       const is = child.days[day] ?? [];
-      for (const activity of is.filter((name) => !was.includes(name))) {
-        events.push(bookingEvent(child, day, activity, BOOKING_CHANGES.BOOKED, deviceOf));
-      }
-      for (const activity of was.filter((name) => !is.includes(name))) {
-        events.push(bookingEvent(child, day, activity, BOOKING_CHANGES.CANCELLED, deviceOf));
+      const booked = is.filter((booking) => !was.includes(bookingKey(booking)));
+      const isKeys = is.map(bookingKey);
+      const cancelled = was.filter((key) => !isKeys.includes(key)).map(bookingFromKey);
+      // One event per activity and per day: a full day booked is ONE
+      // "booked" (activity "Accueil de loisirs : Matin, Repas, Après-midi"),
+      // not one per slot.
+      for (const [change, bookings] of [
+        [BOOKING_CHANGES.BOOKED, booked],
+        [BOOKING_CHANGES.CANCELLED, cancelled],
+      ]) {
+        for (const group of groupByActivity(bookings)) {
+          events.push(bookingEvent(child, day, describeBookings(group), change, deviceOf));
+        }
       }
     }
   }
@@ -137,6 +157,19 @@ function daysToCompare(before, now) {
     days.push(date.toISOString().slice(0, 10));
   }
   return days;
+}
+
+function bookingFromKey(key) {
+  const [activity, ...slot] = key.split('|');
+  return { activity, slot: slot.join('|'), order: 0 };
+}
+
+function groupByActivity(bookings) {
+  const groups = new Map();
+  for (const booking of bookings) {
+    groups.set(booking.activity, [...(groups.get(booking.activity) ?? []), booking]);
+  }
+  return [...groups.values()];
 }
 
 function invoiceData(invoice, extra = {}) {

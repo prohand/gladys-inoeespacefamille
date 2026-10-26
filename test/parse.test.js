@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {
   addDays,
   bookingsByDay,
+  compactBookings,
+  describeBookings,
   daysBetween,
   isBooked,
   localDay,
@@ -80,6 +82,8 @@ test('isBooked reads the presence flag in every form', () => {
   assert.equal(isBooked(withPresence(0)), false);
   assert.equal(isBooked(withPresence('P')), true);
   assert.equal(isBooked(withPresence('A')), false);
+  assert.equal(isBooked(withPresence('PRESENCE')), true);
+  assert.equal(isBooked(withPresence('ABSENCE')), false);
   assert.equal(isBooked(withPresence(undefined)), true);
   assert.equal(isBooked({ anciennePalette: { presence: true } }), true);
   assert.equal(isBooked({}), false);
@@ -87,24 +91,80 @@ test('isBooked reads the presence flag in every form', () => {
   assert.equal(isBooked({ ...withPresence(true), listeAttente: true }), false);
 });
 
-test('bookingsByDay groups the booked activities by day, by name', () => {
+test('bookingsByDay lists every slot booked, in the calendar order', () => {
+  const slots = [
+    {
+      idActivite: 20,
+      plageFonctionnementId: 1,
+      tarifId: 7,
+      periodeIntitule: 'ALSH',
+      abreviation: 'Matin',
+    },
+    {
+      idActivite: 20,
+      plageFonctionnementId: 2,
+      tarifId: 7,
+      periodeIntitule: 'ALSH',
+      abreviation: 'Repas',
+    },
+    {
+      idActivite: 20,
+      plageFonctionnementId: 3,
+      tarifId: 7,
+      periodeIntitule: 'ALSH',
+      abreviation: 'Après-midi',
+    },
+    {
+      idActivite: 10,
+      plageFonctionnementId: 9,
+      tarifId: 8,
+      periodeIntitule: 'Périscolaire',
+      abreviation: 'Soir',
+    },
+  ];
+  const at = (day, plage, activity = 20, presence = 'PRESENCE') => ({
+    date: `${day}T00:00:00`,
+    idActivite: activity,
+    plageFonctionnement_id: plage,
+    tarif_id: activity === 20 ? 7 : 8,
+    nouvellePalette: { presence },
+  });
   const days = bookingsByDay({
-    slots: [
-      { idActivite: 10, intitule: 'Cantine' },
-      { idActivite: 11, intitule: 'Garderie' },
-    ],
+    slots,
     events: [
-      { date: '2026-10-27T00:00:00', idActivite: 11, nouvellePalette: { presence: true } },
-      { date: '2026-10-27T00:00:00', idActivite: 10, nouvellePalette: { presence: true } },
-      { date: '2026-10-27T00:00:00', idActivite: 10, nouvellePalette: { presence: true } },
-      { date: '2026-10-28T00:00:00', idActivite: 10, nouvellePalette: { presence: false } },
+      at('2026-10-27', 3),
+      at('2026-10-27', 1),
+      at('2026-10-27', 2),
+      at('2026-10-27', 2),
+      at('2026-10-27', 9, 10),
+      at('2026-10-28', 1, 20, 'ABSENCE'),
       { date: '2026-10-29T00:00:00', idActivite: 99, nouvellePalette: { presence: true } },
     ],
   });
-  assert.deepEqual(Object.fromEntries(days), {
-    '2026-10-27': ['Cantine', 'Garderie'],
-    '2026-10-29': ['#99'],
+  assert.deepEqual([...days.keys()], ['2026-10-27', '2026-10-29']);
+  const full = days.get('2026-10-27');
+  // The full day is every slot, never "Matin" alone.
+  assert.equal(describeBookings(full), 'ALSH : Matin, Repas, Après-midi · Périscolaire : Soir');
+  assert.equal(compactBookings(full), 'Matin, Repas, Après-midi, Soir');
+  assert.equal(describeBookings(days.get('2026-10-29')), '#99');
+  assert.equal(describeBookings([]), '-');
+});
+
+test('an event on a slot the planning does not list names its activity', () => {
+  const days = bookingsByDay({
+    slots: [
+      { idActivite: 20, plageFonctionnementId: 1, periodeIntitule: 'ALSH', abreviation: 'Matin' },
+    ],
+    events: [
+      {
+        date: '2026-10-27',
+        idActivite: 20,
+        plageFonctionnement_id: 5,
+        nouvellePalette: { presence: 'PRESENCE' },
+      },
+    ],
   });
+  assert.equal(describeBookings(days.get('2026-10-27')), 'ALSH');
 });
 
 test('news are sorted newest first', () => {

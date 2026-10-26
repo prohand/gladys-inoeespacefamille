@@ -54,8 +54,8 @@ test('a booking added or cancelled fires booking_changed for the child', async (
   await service.refresh();
   const lea = gladys.fake.discoveredDevices[1];
 
-  inoe.events[501] = inoe.events[501].filter((item) => item.id !== 3); // no more after-school club on the 27th
-  inoe.events[501].push(event(9, '2026-10-29', 10)); // canteen on the 29th
+  inoe.events[501] = inoe.events[501].filter((item) => item.id !== 5); // no more afternoon on the 27th
+  inoe.events[501].push(event(9, '2026-10-29', 'cantine')); // canteen on the 29th
   await service.refresh();
 
   const changes = gladys.fake.sceneEvents
@@ -69,24 +69,53 @@ test('a booking added or cancelled fires booking_changed for the child', async (
         change: 'cancelled',
         child_name: 'Léa',
         date: '2026-10-27',
-        activity: 'Garderie soir',
+        activity: 'Accueil de loisirs : Après-midi',
       },
       {
         device: lea.external_id,
         change: 'booked',
         child_name: 'Léa',
         date: '2026-10-29',
-        activity: 'Cantine',
+        activity: 'Périscolaire : Cantine',
       },
     ],
   );
+});
+
+test('a full day booked is ONE booking_changed, naming every slot', async () => {
+  const { gladys, inoe, service } = await setup();
+  await service.refresh();
+  inoe.events[501].push(
+    event(20, '2026-10-30', 'matin'),
+    event(21, '2026-10-30', 'repas'),
+    event(22, '2026-10-30', 'apresMidi'),
+  );
+  await service.refresh();
+  const changes = gladys.fake.sceneEvents.filter(({ key }) => key === 'booking_changed');
+  assert.equal(changes.length, 1);
+  assert.equal(changes[0].data.activity, 'Accueil de loisirs : Matin, Repas, Après-midi');
+  assert.equal(changes[0].data.change, 'booked');
+});
+
+test('a memory of the earlier format is recorded, not compared', async () => {
+  const first = await setup();
+  await first.service.refresh();
+  const old = { ...first.disk.memory, bookingsFormat: undefined };
+  old.bookings = { 501: { '2026-10-27': ['Matin'] } };
+  const second = await setup({ memory: old });
+  await second.service.refresh();
+  assert.deepEqual(
+    second.gladys.fake.sceneEvents.filter(({ key }) => key === 'booking_changed'),
+    [],
+  );
+  assert.equal(second.disk.memory.bookingsFormat, 2);
 });
 
 test('a day entering the window is not reported as booked', async () => {
   const { gladys, inoe, service, clock } = await setup();
   await service.refresh();
   // The next day, the 7-day window reaches 2026-11-02 for the first time.
-  inoe.events[501].push(event(10, '2026-11-02', 10));
+  inoe.events[501].push(event(10, '2026-11-02', 'cantine'));
   clock.now = new Date(NOW.getTime() + 24 * 3600 * 1000);
   await service.refresh();
   assert.deepEqual(

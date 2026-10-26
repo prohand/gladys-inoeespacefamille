@@ -54,17 +54,29 @@ export function createFakeInoe() {
       },
     ],
     news: [{ id: 31, titre: 'Fermeture le 11 novembre', date: '2026-10-20T08:00:00' }],
-    slots: [
-      { idActivite: 10, intitule: 'Cantine' },
-      { idActivite: 11, intitule: 'Garderie soir' },
-    ],
-    // Events by child id.
+    // One row per slot, as the portal's calendar lists them.
+    slots: Object.values(SLOTS).map(
+      ([idActivite, plageFonctionnementId, tarifId, activity, slot]) => ({
+        idActivite,
+        plageFonctionnementId,
+        tarifId,
+        periodeIntitule: activity,
+        abreviation: slot,
+        intitule: `${activity} ${slot}`,
+      }),
+    ),
+    // Events by child id: canteen on Monday, a full day of leisure centre on
+    // Tuesday, an absence on Wednesday.
     events: {
       501: [
-        event(1, '2026-10-26', 10),
-        event(2, '2026-10-27', 10),
-        event(3, '2026-10-27', 11),
-        { ...event(4, '2026-10-28', 10), nouvellePalette: { id: 2, presence: false } },
+        event(1, '2026-10-26', 'cantine'),
+        event(2, '2026-10-27', 'matin'),
+        event(3, '2026-10-27', 'repas'),
+        event(5, '2026-10-27', 'apresMidi'),
+        {
+          ...event(4, '2026-10-28', 'cantine'),
+          nouvellePalette: { id: 2, intitule: 'Absence', presence: 'ABSENCE' },
+        },
       ],
       502: [],
     },
@@ -190,13 +202,28 @@ export function createFakeInoe() {
   return fake;
 }
 
-export function event(id, day, activity) {
+// The rows of the fake planning: activity id, slot id, tariff id, activity
+// name, slot name.
+export const SLOTS = {
+  cantine: [10, 100, 1000, 'Périscolaire', 'Cantine'],
+  soir: [10, 101, 1001, 'Périscolaire', 'Garderie soir'],
+  matin: [20, 200, 2000, 'Accueil de loisirs', 'Matin'],
+  repas: [20, 201, 2001, 'Accueil de loisirs', 'Repas'],
+  apresMidi: [20, 202, 2002, 'Accueil de loisirs', 'Après-midi'],
+};
+
+/** A booked event on one slot of SLOTS, shaped like PointageEventVO. */
+export function event(id, day, slot) {
+  const [idActivite, plageFonctionnementId, tarifId] = SLOTS[slot];
   return {
     id,
     idIndividu: 501,
     date: `${day}T00:00:00`,
-    idActivite: activity,
-    nouvellePalette: { id: 1, intitule: 'Réservé', presence: true },
+    idActivite,
+    plageFonctionnement_id: plageFonctionnementId,
+    tarif_id: tarifId,
+    checked: true,
+    nouvellePalette: { id: 1, intitule: 'Réservation', presence: 'PRESENCE' },
   };
 }
 

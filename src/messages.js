@@ -7,6 +7,7 @@
 
 import { localize, pick } from './i18n.js';
 import { INOE_ERRORS } from './inoe/client.js';
+import { describeBookings } from './inoe/parse.js';
 
 const LOCALES = { en: 'en-GB', fr: 'fr-FR', de: 'de-DE', es: 'es-ES' };
 
@@ -142,7 +143,7 @@ export function testReport(snapshot) {
         continue;
       }
       const next = child.next
-        ? `${formatDay(child.next.date, language)} (${child.next.activities.join(', ')})`
+        ? `${formatDay(child.next.date, language)} (${describeBookings(child.next.activities)})`
         : t({ en: 'none', fr: 'aucune', de: 'keine', es: 'ninguna' });
       lines.push(
         t({

@@ -17,7 +17,7 @@ import { parseDossierId } from '../config.js';
 import { FAMILY_FEATURES, familyIds } from '../devices/family.js';
 import { localize, pick } from '../i18n.js';
 import { PORTAL_URL } from '../inoe/client.js';
-import { daysBetween } from '../inoe/parse.js';
+import { compactBookings, daysBetween } from '../inoe/parse.js';
 import { errorMessage, formatAmount, formatDay, refreshedMessage } from '../messages.js';
 import { FAMILY_WIDGET, WIDGET_ACTIONS } from './keys.js';
 
@@ -77,27 +77,42 @@ function nextInvoiceRow(snapshot, config) {
   };
 }
 
-function childRow(child) {
-  const none = { en: 'nothing', fr: 'rien', de: 'nichts', es: 'nada' };
-  const value = localize((language) => {
-    const today = child.today.length > 0 ? child.today.join(', ') : pick(language, none);
-    const tomorrow = child.tomorrow.length > 0 ? child.tomorrow.join(', ') : pick(language, none);
-    const words = pick(language, {
-      en: ['Today', 'tomorrow'],
-      fr: ['Auj.', 'demain'],
-      de: ['Heute', 'morgen'],
-      es: ['Hoy', 'mañana'],
-    });
-    return `${words[0]}: ${today} · ${words[1]}: ${tomorrow}`;
+const DAY_WORDS = {
+  today: { en: 'today', fr: "aujourd'hui", de: 'heute', es: 'hoy' },
+  tomorrow: { en: 'tomorrow', fr: 'demain', de: 'morgen', es: 'mañana' },
+};
+
+/**
+ * One row per child and per day: a full day lists every slot (morning,
+ * lunch, afternoon), which one row for both days could not hold in 40
+ * characters.
+ */
+function childRows(child) {
+  const none = { en: 'Nothing', fr: 'Rien', de: 'Nichts', es: 'Nada' };
+  return ['today', 'tomorrow'].map((day) => {
+    const bookings = child[day];
+    const label = clipAll(
+      localize((language) => `${child.name} · ${pick(language, DAY_WORDS[day])}`),
+    );
+    if (!child.planningRead) {
+      return {
+        label,
+        icon: 'user',
+        value: { en: 'Unreadable', fr: 'Illisible', de: 'Nicht lesbar', es: 'Ilegible' },
+        color: WIDGET_COLORS.WARNING,
+      };
+    }
+    let color = WIDGET_COLORS.NEUTRAL;
+    if (bookings.length > 0) {
+      color = day === 'today' ? WIDGET_COLORS.SUCCESS : WIDGET_COLORS.INFO;
+    }
+    return {
+      label,
+      icon: day === 'today' ? 'user' : 'calendar',
+      value: bookings.length > 0 ? clip(compactBookings(bookings)) : none,
+      color,
+    };
   });
-  return {
-    label: clip(child.name),
-    icon: 'user',
-    value: child.planningRead
-      ? clipAll(value)
-      : { en: 'Unreadable', fr: 'Illisible', de: 'Nicht lesbar', es: 'Ilegible' },
-    color: child.today.length > 0 ? WIDGET_COLORS.SUCCESS : WIDGET_COLORS.NEUTRAL,
-  };
 }
 
 /** The widget content for the current state of the service. */
@@ -149,7 +164,10 @@ export function buildFamilyWidget(service) {
     };
   }
 
-  const rows = [nextInvoiceRow(snapshot, config), ...snapshot.children.slice(0, 8).map(childRow)];
+  const rows = [
+    nextInvoiceRow(snapshot, config),
+    ...snapshot.children.slice(0, 4).flatMap(childRows),
+  ];
   if (snapshot.documentsExpected > 0) {
     rows.push({
       label: {

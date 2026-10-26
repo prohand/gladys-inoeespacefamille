@@ -11,8 +11,8 @@ All notable changes to this integration are documented here. The format follows
 - First version of the iNoé Espace Famille integration (AIGA family portal), read-only and cloud.
 - A "family" device: amount due (€), invoices to pay, next due date, documents expected, latest
   news of the structure.
-- One device per child: booked today / tomorrow, the activities booked (canteen, after-school
-  club, leisure centre…) and the number of days booked ahead.
+- One device per child: booked today / tomorrow, every slot booked (a full day of leisure centre
+  reads "Matin, Repas, Après-midi"), and the number of days booked ahead.
 - Scene triggers: new invoice, invoice due soon, a child's booking changed, new message from the
   structure.
 - Scene actions: read the portal now, check a child's booking for today or tomorrow.

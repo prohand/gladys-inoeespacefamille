@@ -18,7 +18,7 @@
 
 import { createLogger } from '@gladysassistant/integration-sdk';
 import { findChild } from '../devices/index.js';
-import { localDay } from '../inoe/parse.js';
+import { describeBookings, localDay } from '../inoe/parse.js';
 import { CHECK_DAYS, SCENE_ACTIONS } from './keys.js';
 
 const logger = createLogger({ name: 'scenes' });
@@ -55,8 +55,11 @@ export function createSceneActions(service) {
         // A device of the family account, or a child no longer listed.
         throw new Error('This device is not a child of the iNoé account');
       }
-      const activities = fields.day === CHECK_DAYS.TOMORROW ? child.tomorrow : child.today;
-      return { booked: activities.length > 0, activities: activities.join(', ') };
+      const bookings = fields.day === CHECK_DAYS.TOMORROW ? child.tomorrow : child.today;
+      return {
+        booked: bookings.length > 0,
+        activities: bookings.length > 0 ? describeBookings(bookings) : '',
+      };
     },
   };
 }

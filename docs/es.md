@@ -59,13 +59,13 @@ Un dispositivo con el nombre del centro (y de su familia):
 
 Un dispositivo por niño («Léa – iNoé»):
 
-| Función           | Valor                                                     |
-| ----------------- | --------------------------------------------------------- |
-| Booked today      | 1 si el niño tiene al menos una reserva hoy, si no 0      |
-| Booked tomorrow   | 1 si el niño tiene al menos una reserva mañana, si no 0   |
-| Today             | Las actividades reservadas hoy («Cantine, Garderie soir») |
-| Tomorrow          | Las actividades reservadas mañana                         |
-| Days booked ahead | Número de días reservados en el periodo leído             |
+| Función           | Valor                                                                            |
+| ----------------- | -------------------------------------------------------------------------------- |
+| Booked today      | 1 si el niño tiene al menos una reserva hoy, si no 0                             |
+| Booked tomorrow   | 1 si el niño tiene al menos una reserva mañana, si no 0                          |
+| Today             | Las actividades reservadas hoy («Accueil de loisirs : Matin, Repas, Après-midi») |
+| Tomorrow          | Las actividades reservadas mañana                                                |
+| Days booked ahead | Número de días reservados en el periodo leído                                    |
 
 Una ausencia o una plaza en lista de espera no cuenta como reserva.
 

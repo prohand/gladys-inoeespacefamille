@@ -59,13 +59,13 @@ Un appareil au nom de la structure (et de votre famille) :
 
 Un appareil par enfant (« Léa – iNoé ») :
 
-| Fonctionnalité    | Valeur                                                           |
-| ----------------- | ---------------------------------------------------------------- |
-| Booked today      | 1 si l'enfant a au moins une réservation aujourd'hui, sinon 0    |
-| Booked tomorrow   | 1 si l'enfant a au moins une réservation demain, sinon 0         |
-| Today             | Les activités réservées aujourd'hui (« Cantine, Garderie soir ») |
-| Tomorrow          | Les activités réservées demain                                   |
-| Days booked ahead | Nombre de jours réservés sur la période lue                      |
+| Fonctionnalité    | Valeur                                                                                  |
+| ----------------- | --------------------------------------------------------------------------------------- |
+| Booked today      | 1 si l'enfant a au moins une réservation aujourd'hui, sinon 0                           |
+| Booked tomorrow   | 1 si l'enfant a au moins une réservation demain, sinon 0                                |
+| Today             | Les activités réservées aujourd'hui (« Accueil de loisirs : Matin, Repas, Après-midi ») |
+| Tomorrow          | Les activités réservées demain                                                          |
+| Days booked ahead | Nombre de jours réservés sur la période lue                                             |
 
 Une absence ou une place en liste d'attente ne compte pas comme une réservation.
 

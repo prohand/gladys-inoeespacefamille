@@ -21,11 +21,11 @@ test('check_booking answers for today and tomorrow', async () => {
 
   assert.deepEqual(
     await actions[SCENE_ACTIONS.CHECK_BOOKING]({ device: lea.external_id, day: 'today' }),
-    { booked: true, activities: 'Cantine' },
+    { booked: true, activities: 'Périscolaire : Cantine' },
   );
   assert.deepEqual(
     await actions[SCENE_ACTIONS.CHECK_BOOKING]({ device: lea.external_id, day: 'tomorrow' }),
-    { booked: true, activities: 'Cantine, Garderie soir' },
+    { booked: true, activities: 'Accueil de loisirs : Matin, Repas, Après-midi' },
   );
   // Not booked is an output, not a failure.
   assert.deepEqual(
@@ -44,7 +44,7 @@ test('check_booking reads the portal again once the day has changed', async () =
   const device = service.gladys.externalIds('child', `11578177-${lea.id}`).device;
   assert.deepEqual(await actions[SCENE_ACTIONS.CHECK_BOOKING]({ device, day: 'today' }), {
     booked: true,
-    activities: 'Cantine, Garderie soir',
+    activities: 'Accueil de loisirs : Matin, Repas, Après-midi',
   });
   assert.ok(inoe.calls.length > before);
 });

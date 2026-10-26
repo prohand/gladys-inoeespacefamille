@@ -25,17 +25,27 @@ test('the amount tile is bound to the published amount-due feature', async () =>
   assert.ok(family.features.some((feature) => feature.external_id === tile.device_feature));
 });
 
-test('the status rows show the next invoice and every child', async () => {
+test('the status rows show the next invoice and each child today and tomorrow', async () => {
+  const { service } = await setup();
+  await service.refresh();
+  const { items } = buildFamilyWidget(service).components.find((c) => c.type === 'status');
+  assert.match(items[0].value.fr, /42,50\s€/);
+  assert.deepEqual(
+    items.slice(1, 5).map((item) => item.label.fr),
+    ["Léa · aujourd'hui", 'Léa · demain', "Tom · aujourd'hui", 'Tom · demain'],
+  );
+  assert.equal(items[1].value, 'Cantine');
+  // The full day fits in its own row.
+  assert.equal(items[2].value, 'Matin, Repas, Après-midi');
+  assert.equal(items[3].value.fr, 'Rien');
+  assert.equal(items[5].value, 1); // documents expected
+});
+
+test('an invoice close to its due date shows in orange', async () => {
   const { service } = await setup({ now: new Date('2026-11-03T08:00:00Z') });
   await service.refresh();
   const { items } = buildFamilyWidget(service).components.find((c) => c.type === 'status');
   assert.equal(items[0].color, 'warning'); // due in 2 days, reminder at 3
-  assert.match(items[0].value.fr, /42,50\s€/);
-  assert.deepEqual(
-    items.slice(1, 3).map((item) => item.label),
-    ['Léa', 'Tom'],
-  );
-  assert.equal(items[3].value, 1); // documents expected
 });
 
 test('a failed read keeps the last rows and says why', async () => {

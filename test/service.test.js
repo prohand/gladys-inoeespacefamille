@@ -39,8 +39,9 @@ test('the states say what the portal shows', async () => {
 
   assert.equal(state(lea, 'booked-today'), 1);
   assert.equal(state(lea, 'booked-tomorrow'), 1);
-  assert.equal(state(lea, 'today'), 'Cantine');
-  assert.equal(state(lea, 'tomorrow'), 'Cantine, Garderie soir');
+  assert.equal(state(lea, 'today'), 'Périscolaire : Cantine');
+  // A full day: every slot, not the first one alone.
+  assert.equal(state(lea, 'tomorrow'), 'Accueil de loisirs : Matin, Repas, Après-midi');
   // The 28th carries an absence: two days booked over the week.
   assert.equal(state(lea, 'booked-days'), 2);
 });

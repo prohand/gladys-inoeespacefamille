@@ -73,7 +73,7 @@ application (`https://espacefamille.aiga.fr`), read-only:
    `familleFacturesMontant`, `familleDocumentsAttendus`, `familleVO.listeEnfants`),
    `GET factureController/factures?panier=false&limit=50`, `GET public/filactuController/messages/`,
    `GET pointageANController/events/?idIndividu&dateDebut&dateFin` and
-   `GET pointageANController/plageFonctionnements/` (same params: activity names).
+   `GET pointageANController/plageFonctionnements/` (same params: the rows — slot names).
 
 A 401/403 on a data call = session expired: log in again once (`withSession`).
 
@@ -88,6 +88,11 @@ A 401/403 on a data call = session expired: log in again once (`withSession`).
 - **"Booked"** = a planning event whose palette (`nouvellePalette`, else `anciennePalette`) means
   presence, not `toDelete`, not `listeAttente` (`isBooked`). The type of `presence` is not
   documented: boolean, 0/1 and letters are all read. Confirm on a real account before changing it.
+- **A booking is a slot, not an activity**: the calendar has one row per slot (activity +
+  `plageFonctionnementId` + `tarifId`); `periodeIntitule` names the activity, `abreviation` the
+  slot. A full day is all its slots ("Accueil de loisirs : Matin, Repas, Après-midi"); naming
+  bookings by activity id once showed a full day as "Matin". The memory stores
+  `activity|slot` keys (`bookingsFormat: 2`); a memory of another format is not compared.
 - **Today / tomorrow** are computed in the configured `timezone` (default Europe/Paris), never
   in the container's UTC.
 - **Scene events only for changes**: the first read of an account records without reporting

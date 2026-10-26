@@ -51,8 +51,8 @@ test('the whole flow: build, dossier, login, then the data', async () => {
   assert.equal((await client.invoices()).length, 1);
   assert.equal((await client.news()).length, 1);
   const planning = await client.planning('501', '2026-10-26', '2026-10-27');
-  assert.equal(planning.events.length, 3);
-  assert.equal(planning.slots.length, 2);
+  assert.equal(planning.events.length, 4);
+  assert.equal(planning.slots.length, 5);
   assert.equal(fake.logins, 1);
 });
 
