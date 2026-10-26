@@ -103,8 +103,7 @@ npm start
 4. Make the ghcr.io package **public** after the first build (Package settings → visibility),
    so Gladys can pull it.
 
-Replace `cover.png` (800×534 px, ≤ 150 KB) with your own picture before the first release: the
-one here is the template's placeholder.
+`cover.png` is the catalog cover (800×534 px, ≤ 150 KB).
 
 ## License
 
