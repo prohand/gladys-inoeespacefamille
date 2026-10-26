@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   apiBaseFor,
   baseFromRedirect,
+  describeShape,
   INOE_ERRORS,
   InoeClient,
   InoeError,
@@ -131,4 +132,36 @@ test('reset forgets the session: the next call logs in again', async () => {
   client.reset();
   await client.dashboard();
   assert.equal(fake.logins, 2);
+});
+
+test('the user comes from getSession, not from the ISM answer', async () => {
+  const fake = createFakeInoe();
+  const client = clientFor(fake);
+  const session = await client.login();
+  assert.equal(session.apiUser.id, 42);
+  assert.ok(fake.calls.some((call) => call.url.endsWith('/loginController/getSession')));
+});
+
+test('a login that opens no session says what came back, never the values', async () => {
+  const fake = createFakeInoe();
+  fake.noCookie = true;
+  await assert.rejects(clientFor(fake).login(), (err) => {
+    assert.equal(err.code, INOE_ERRORS.LOGIN);
+    assert.match(err.message, /ISM answer \{token,expiresIn\}, cookies: none/);
+    assert.doesNotMatch(err.message, /jwt-not-a-user/);
+    return true;
+  });
+});
+
+test('an account that is not a family account is refused', async () => {
+  const fake = createFakeInoe();
+  fake.roles = ['ROLE_AGENT'];
+  await assert.rejects(clientFor(fake).login(), /not a family account/);
+});
+
+test('describeShape gives the keys, never the values', () => {
+  assert.equal(describeShape('{"token":"secret","user":{"id":1}}'), '{token,user}');
+  assert.equal(describeShape(''), 'empty');
+  assert.equal(describeShape('OK'), 'text(2)');
+  assert.equal(describeShape([1, 2]), 'array(2)');
 });

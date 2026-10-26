@@ -64,7 +64,11 @@ application (`https://espacefamille.aiga.fr`), read-only:
 2. `POST <api>/<n>/public/infoDossierController/dossier` → `{ code, infosGenerales.nomStructure }`.
    A 303 moves the structure to another API base (follow `Location` once).
 3. `POST https://ism.aiga.fr/login` `{ username, password }` (JSON) → session **cookies** on
-   `.aiga.fr`. The web form also shows a reCAPTCHA, but the login call itself carries none.
+   `.aiga.fr`; its answer is NOT the session. Then `POST <api>/<CODE>/loginController/getSession`
+   (`token=null`, cookies) → `{ apiUser: { id, login, roles } }`: `id === -1` means no session
+   was opened, `roles` must hold `ROLE_FAMILLE`. The web form also shows a reCAPTCHA, but the
+   login call itself carries none. A failed login logs the SHAPE of both answers and the cookie
+   names (`describeShape`), never their values.
 4. Data, with `token=null` and the cookies: `POST tableaudebordController/infos/` (dashboard:
    `familleFacturesMontant`, `familleDocumentsAttendus`, `familleVO.listeEnfants`),
    `GET factureController/factures`, `GET filactuController/messages/`,

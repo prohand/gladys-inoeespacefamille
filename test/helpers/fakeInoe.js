@@ -17,6 +17,9 @@ export function createFakeInoe() {
     build: BUILD,
     dossiers: { [DOSSIER_ID]: { code: 'demo', nomStructure: 'Ville de Démo' } },
     users: { [USERNAME]: PASSWORD },
+    roles: ['ROLE_FAMILLE'],
+    // Set to true to make ISM accept the password but set no cookie.
+    noCookie: false,
     // Set to a URL to make the dossier endpoint answer 303 once.
     redirectDossierTo: null,
     maintenance: false,
@@ -97,8 +100,11 @@ export function createFakeInoe() {
       fake.logins += 1;
       const session = `sess-${fake.logins}`;
       fake.sessions.add(session);
-      return reply(200, JSON.stringify({ apiUser: { id: 42, roles: ['ROLE_FAMILLE'] } }), {
-        'set-cookie': [`SESSION=${session}; Domain=.aiga.fr; Path=/; Secure; HttpOnly`],
+      // Like ISM: a token and cookies, no portal user (that comes from getSession).
+      return reply(200, JSON.stringify({ token: 'jwt-not-a-user', expiresIn: 900 }), {
+        'set-cookie': fake.noCookie
+          ? []
+          : [`SESSION=${session}; Domain=.aiga.fr; Path=/; Secure; HttpOnly`],
       });
     }
 
@@ -126,7 +132,17 @@ export function createFakeInoe() {
         );
       }
       const session = /SESSION=([^;]+)/.exec(headers.cookie ?? '')?.[1];
-      if (!session || !fake.sessions.has(session)) {
+      const signedIn = Boolean(session && fake.sessions.has(session));
+      if (path === 'loginController/getSession') {
+        // Without a valid session the portal answers an anonymous user.
+        return json({
+          apiUser: signedIn
+            ? { id: 42, login: USERNAME, roles: fake.roles }
+            : { id: -1, roles: [] },
+          loginAsToken: null,
+        });
+      }
+      if (!signedIn) {
         return reply(401, '');
       }
       if (dossierOrCode !== 'DEMO') {

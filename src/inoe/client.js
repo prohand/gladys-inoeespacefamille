@@ -251,14 +251,56 @@ export class InoeClient {
         status: response.status,
       });
     }
-    const session = await this.readJson(response, 'login');
+    // The ISM answer is not the session: like the web application, ask the
+    // portal for it (`loginController/getSession`), carried by the cookies
+    // the login just set. Its body is only described, never logged: it may
+    // hold a token.
+    const loginBody = await response.text();
+    logger.debug(
+      `ISM login HTTP ${response.status}, answer ${describeShape(loginBody)}, cookies: ${this.jar.describe() || 'none'}`,
+    );
+    const session = await this.fetchSession();
     const user = session?.apiUser;
-    if (!user || user.id === -1) {
-      throw new InoeError(INOE_ERRORS.LOGIN, 'login: no user in the session');
+    if (!user || user.id === -1 || user.id === undefined || user.id === null) {
+      throw new InoeError(
+        INOE_ERRORS.LOGIN,
+        `login: the portal opened no session (ISM answer ${describeShape(loginBody)}, ` +
+          `cookies: ${this.jar.describe() || 'none'}, session ${describeShape(session)})`,
+      );
+    }
+    if (Array.isArray(user.roles) && !user.roles.includes('ROLE_FAMILLE')) {
+      throw new InoeError(
+        INOE_ERRORS.LOGIN,
+        `login: not a family account (${user.roles.join(',')})`,
+      );
     }
     this.session = session;
-    logger.debug(`Logged in (cookies: ${this.jar.describe() || 'none'})`);
+    logger.debug('Logged in');
     return session;
+  }
+
+  /** The portal session (`loginController/getSession`), outside `withSession`. */
+  async fetchSession() {
+    const response = await this.request(this.controllerUrl('loginController/getSession'), {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+      body: new URLSearchParams({ token: 'null' }).toString(),
+    });
+    if (response.status === 401 || response.status === 403) {
+      throw new InoeError(
+        INOE_ERRORS.LOGIN,
+        `getSession: HTTP ${response.status} (cookies: ${this.jar.describe() || 'none'})`,
+        { status: response.status },
+      );
+    }
+    if (!response.ok) {
+      throw new InoeError(INOE_ERRORS.HTTP, `getSession: HTTP ${response.status}`, {
+        status: response.status,
+      });
+    }
+    const body = await this.readJson(response, 'getSession');
+    // Answered either as the session itself or wrapped in `data`.
+    return body?.apiUser ? body : body?.data?.apiUser ? body.data : (body?.data?.[0] ?? body);
   }
 
   async ensureSession() {
@@ -380,6 +422,31 @@ export class InoeClient {
     this.apiBase = null;
     this.jar.clear();
   }
+}
+
+/**
+ * The shape of an answer for the logs — its type and top-level keys — so a
+ * change of the portal can be diagnosed without logging a token or a name.
+ */
+export function describeShape(value) {
+  let parsed = value;
+  if (typeof value === 'string') {
+    if (value.trim() === '') {
+      return 'empty';
+    }
+    try {
+      parsed = JSON.parse(value);
+    } catch {
+      return `text(${value.length})`;
+    }
+  }
+  if (Array.isArray(parsed)) {
+    return `array(${parsed.length})`;
+  }
+  if (parsed && typeof parsed === 'object') {
+    return `{${Object.keys(parsed).slice(0, 15).join(',')}}`;
+  }
+  return typeof parsed;
 }
 
 function hostOf(url) {
