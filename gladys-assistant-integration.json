@@ -74,16 +74,16 @@
         "es": "Dirección del portal"
       },
       "description": {
-        "en": "The address of your portal as your structure sent it, e.g. https://espacefamille.aiga.fr/11578177 — or just the number at its end.",
-        "fr": "L'adresse de votre portail telle que votre structure vous l'a envoyée, par exemple https://espacefamille.aiga.fr/11578177 — ou seulement le numéro à la fin.",
-        "de": "Die Adresse Ihres Portals, wie Ihre Einrichtung sie geschickt hat, z. B. https://espacefamille.aiga.fr/11578177 — oder nur die Nummer am Ende.",
-        "es": "La dirección de su portal tal como se la envió su centro, p. ej. https://espacefamille.aiga.fr/11578177 — o solo el número del final."
+        "en": "Paste the address of the portal's sign-in page, e.g. https://espacefamille.aiga.fr/index.html?dossier=1626256 or https://espacefamille.aiga.fr/11578177 — or just that number.",
+        "fr": "Collez l'adresse de la page de connexion du portail, par exemple https://espacefamille.aiga.fr/index.html?dossier=1626256 ou https://espacefamille.aiga.fr/11578177 — ou seulement ce numéro.",
+        "de": "Fügen Sie die Adresse der Anmeldeseite des Portals ein, z. B. https://espacefamille.aiga.fr/index.html?dossier=1626256 oder https://espacefamille.aiga.fr/11578177 — oder nur diese Nummer.",
+        "es": "Pegue la dirección de la página de inicio de sesión del portal, p. ej. https://espacefamille.aiga.fr/index.html?dossier=1626256 o https://espacefamille.aiga.fr/11578177 — o solo ese número."
       },
       "placeholder": {
-        "en": "https://espacefamille.aiga.fr/11578177",
-        "fr": "https://espacefamille.aiga.fr/11578177",
-        "de": "https://espacefamille.aiga.fr/11578177",
-        "es": "https://espacefamille.aiga.fr/11578177"
+        "en": "https://espacefamille.aiga.fr/index.html?dossier=1626256",
+        "fr": "https://espacefamille.aiga.fr/index.html?dossier=1626256",
+        "de": "https://espacefamille.aiga.fr/index.html?dossier=1626256",
+        "es": "https://espacefamille.aiga.fr/index.html?dossier=1626256"
       },
       "required": true
     },

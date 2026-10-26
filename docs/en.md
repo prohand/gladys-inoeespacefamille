@@ -22,15 +22,15 @@ Gladys 5.3 or newer is required.
 In Gladys, open **Integrations**, install **iNoé Espace Famille**, then fill in the
 configuration screen:
 
-| Field                      | What to enter                                                                                                                         |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Portal address             | The address your structure sent you by email, e.g. `https://espacefamille.aiga.fr/11578177`. The number alone (`11578177`) works too. |
-| Email                      | The email you sign in to the portal with.                                                                                             |
-| Password                   | The portal password. It is only sent to the AIGA sign-in server and never written to the logs.                                        |
-| Refresh interval (min)     | How often the portal is read, in minutes (60 by default, 15 to 1440).                                                                 |
-| Invoice reminder (days)    | How many days before the due date the "An invoice is due soon" trigger fires (3 by default).                                          |
-| Planning read ahead (days) | How many days of each child's planning are read, today included (7 by default).                                                       |
-| Time zone                  | What decides "today" and "tomorrow": `Europe/Paris` by default, `Indian/Reunion`, `America/Martinique`… for overseas France.          |
+| Field                      | What to enter                                                                                                                                                                                                      |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Portal address             | The address of the portal's sign-in page, copied as is: `https://espacefamille.aiga.fr/index.html?dossier=1626256#connexion…` or `https://espacefamille.aiga.fr/11578177`. The number alone (`1626256`) works too. |
+| Email                      | The email you sign in to the portal with.                                                                                                                                                                          |
+| Password                   | The portal password. It is only sent to the AIGA sign-in server and never written to the logs.                                                                                                                     |
+| Refresh interval (min)     | How often the portal is read, in minutes (60 by default, 15 to 1440).                                                                                                                                              |
+| Invoice reminder (days)    | How many days before the due date the "An invoice is due soon" trigger fires (3 by default).                                                                                                                       |
+| Planning read ahead (days) | How many days of each child's planning are read, today included (7 by default).                                                                                                                                    |
+| Time zone                  | What decides "today" and "tomorrow": `Europe/Paris` by default, `Indian/Reunion`, `America/Martinique`… for overseas France.                                                                                       |
 
 Click **Test the connection**: the answer gives the name of the structure, the amount due and,
 for each child, the days booked and the next booking.
@@ -39,7 +39,7 @@ Then open the **Discovery** tab of the integration and create the devices.
 
 > **Where is the portal address?** In the account creation email your structure sent, or in the
 > address bar of your browser while on the portal: it is the number after
-> `espacefamille.aiga.fr/`.
+> `dossier=` (or after `espacefamille.aiga.fr/`).
 
 ## Devices
 

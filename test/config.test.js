@@ -16,6 +16,11 @@ test('the structure number is read from what the user pastes', () => {
     parseDossierId('https://espacefamille.aiga.fr/index.html?dossier=2000212'),
     '2000212',
   );
+  // The sign-in page as the browser shows it, hash included.
+  assert.equal(
+    parseDossierId('https://espacefamille.aiga.fr/index.html?dossier=1626256#connexion&212628'),
+    '1626256',
+  );
   assert.equal(parseDossierId(' 11578177 '), '11578177');
   assert.equal(parseDossierId('https://espacefamille.aiga.fr/'), null);
   assert.equal(parseDossierId('mairie'), null);

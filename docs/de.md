@@ -22,15 +22,15 @@ Gladys 5.3 oder neuer ist erforderlich.
 Öffnen Sie in Gladys **Integrationen**, installieren Sie **iNoé Espace Famille** und füllen Sie
 den Konfigurationsbildschirm aus:
 
-| Feld                           | Was einzutragen ist                                                                                                                                   |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Portaladresse                  | Die Adresse, die Ihre Einrichtung per E-Mail geschickt hat, z. B. `https://espacefamille.aiga.fr/11578177`. Die Nummer allein (`11578177`) geht auch. |
-| E-Mail                         | Die E-Mail, mit der Sie sich im Portal anmelden.                                                                                                      |
-| Passwort                       | Das Passwort des Portals. Es wird nur an den Anmeldeserver von AIGA gesendet und nie in die Protokolle geschrieben.                                   |
-| Aktualisierungsintervall (min) | Wie oft das Portal gelesen wird, in Minuten (standardmäßig 60, von 15 bis 1440).                                                                      |
-| Rechnungserinnerung (Tage)     | Wie viele Tage vor der Fälligkeit der Auslöser „Eine Rechnung wird bald fällig“ ausgelöst wird (standardmäßig 3).                                     |
-| Vorausgelesene Planung (Tage)  | Wie viele Tage der Planung jedes Kindes gelesen werden, heute eingeschlossen (standardmäßig 7).                                                       |
-| Zeitzone                       | Was „heute“ und „morgen“ bestimmt: standardmäßig `Europe/Paris`, `Indian/Reunion`, `America/Martinique`… für die Überseegebiete.                      |
+| Feld                           | Was einzutragen ist                                                                                                                                                                                                          |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Portaladresse                  | Die Adresse der Anmeldeseite des Portals, unverändert kopiert: `https://espacefamille.aiga.fr/index.html?dossier=1626256#connexion…` oder `https://espacefamille.aiga.fr/11578177`. Die Nummer allein (`1626256`) geht auch. |
+| E-Mail                         | Die E-Mail, mit der Sie sich im Portal anmelden.                                                                                                                                                                             |
+| Passwort                       | Das Passwort des Portals. Es wird nur an den Anmeldeserver von AIGA gesendet und nie in die Protokolle geschrieben.                                                                                                          |
+| Aktualisierungsintervall (min) | Wie oft das Portal gelesen wird, in Minuten (standardmäßig 60, von 15 bis 1440).                                                                                                                                             |
+| Rechnungserinnerung (Tage)     | Wie viele Tage vor der Fälligkeit der Auslöser „Eine Rechnung wird bald fällig“ ausgelöst wird (standardmäßig 3).                                                                                                            |
+| Vorausgelesene Planung (Tage)  | Wie viele Tage der Planung jedes Kindes gelesen werden, heute eingeschlossen (standardmäßig 7).                                                                                                                              |
+| Zeitzone                       | Was „heute“ und „morgen“ bestimmt: standardmäßig `Europe/Paris`, `Indian/Reunion`, `America/Martinique`… für die Überseegebiete.                                                                                             |
 
 Klicken Sie auf **Verbindung testen**: Die Antwort nennt die Einrichtung, den offenen Betrag und
 für jedes Kind die gebuchten Tage und die nächste Buchung.
@@ -38,7 +38,7 @@ für jedes Kind die gebuchten Tage und die nächste Buchung.
 Öffnen Sie dann den Reiter **Erkennung** der Integration und legen Sie die Geräte an.
 
 > **Wo steht die Portaladresse?** In der E-Mail zur Kontoerstellung Ihrer Einrichtung, oder in
-> der Adresszeile Ihres Browsers im Portal: Es ist die Zahl nach `espacefamille.aiga.fr/`.
+> der Adresszeile Ihres Browsers im Portal: Es ist die Zahl nach `dossier=` (oder nach `espacefamille.aiga.fr/`).
 
 ## Geräte
 

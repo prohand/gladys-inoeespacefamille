@@ -22,15 +22,15 @@ Se necesita Gladys 5.3 o posterior.
 En Gladys, abra **Integraciones**, instale **iNoé Espace Famille** y complete la pantalla de
 configuración:
 
-| Campo                                     | Qué poner                                                                                                                                  |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Dirección del portal                      | La dirección que su centro le envió por correo, p. ej. `https://espacefamille.aiga.fr/11578177`. También vale solo el número (`11578177`). |
-| Correo electrónico                        | El correo con el que inicia sesión en el portal.                                                                                           |
-| Contraseña                                | La contraseña del portal. Solo se envía al servidor de inicio de sesión de AIGA y nunca se escribe en los registros.                       |
-| Intervalo de actualización (min)          | Cada cuántos minutos se lee el portal (60 por defecto, de 15 a 1440).                                                                      |
-| Recordatorio de factura (días)            | Cuántos días antes del vencimiento se activa el disparador «Una factura vence pronto» (3 por defecto).                                     |
-| Planificación leída por adelantado (días) | Cuántos días de la planificación de cada niño se leen, hoy incluido (7 por defecto).                                                       |
-| Zona horaria                              | Lo que decide «hoy» y «mañana»: `Europe/Paris` por defecto, `Indian/Reunion`, `America/Martinique`… para ultramar.                         |
+| Campo                                     | Qué poner                                                                                                                                                                                                                              |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dirección del portal                      | La dirección de la página de inicio de sesión del portal, copiada tal cual: `https://espacefamille.aiga.fr/index.html?dossier=1626256#connexion…` o `https://espacefamille.aiga.fr/11578177`. También vale solo el número (`1626256`). |
+| Correo electrónico                        | El correo con el que inicia sesión en el portal.                                                                                                                                                                                       |
+| Contraseña                                | La contraseña del portal. Solo se envía al servidor de inicio de sesión de AIGA y nunca se escribe en los registros.                                                                                                                   |
+| Intervalo de actualización (min)          | Cada cuántos minutos se lee el portal (60 por defecto, de 15 a 1440).                                                                                                                                                                  |
+| Recordatorio de factura (días)            | Cuántos días antes del vencimiento se activa el disparador «Una factura vence pronto» (3 por defecto).                                                                                                                                 |
+| Planificación leída por adelantado (días) | Cuántos días de la planificación de cada niño se leen, hoy incluido (7 por defecto).                                                                                                                                                   |
+| Zona horaria                              | Lo que decide «hoy» y «mañana»: `Europe/Paris` por defecto, `Indian/Reunion`, `America/Martinique`… para ultramar.                                                                                                                     |
 
 Pulse **Probar la conexión**: la respuesta indica el nombre del centro, el importe pendiente y,
 para cada niño, los días reservados y la próxima reserva.
@@ -39,7 +39,7 @@ Abra después la pestaña **Descubrimiento** de la integración y cree los dispo
 
 > **¿Dónde está la dirección del portal?** En el correo de creación de cuenta que envió su
 > centro, o en la barra de direcciones del navegador cuando está en el portal: es el número
-> después de `espacefamille.aiga.fr/`.
+> después de `dossier=` (o de `espacefamille.aiga.fr/`).
 
 ## Dispositivos
 

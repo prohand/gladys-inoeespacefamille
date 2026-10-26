@@ -22,15 +22,15 @@ Gladys 5.3 ou plus récent est nécessaire.
 Dans Gladys, ouvrez **Intégrations**, installez **iNoé Espace Famille**, puis remplissez l'écran
 de configuration :
 
-| Champ                          | Ce qu'il faut mettre                                                                                                                                     |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Adresse du portail             | L'adresse que votre structure vous a envoyée par e-mail, par exemple `https://espacefamille.aiga.fr/11578177`. Le numéro seul (`11578177`) suffit aussi. |
-| E-mail                         | L'e-mail avec lequel vous vous connectez au portail.                                                                                                     |
-| Mot de passe                   | Le mot de passe du portail. Il n'est envoyé qu'au serveur de connexion d'AIGA et n'est jamais écrit dans les journaux.                                   |
-| Intervalle de rafraîchissement | Toutes les combien de minutes le portail est lu (60 par défaut, de 15 à 1440).                                                                           |
-| Rappel de facture              | Combien de jours avant l'échéance le déclencheur « Une facture arrive à échéance » se déclenche (3 par défaut).                                          |
-| Planning lu à l'avance         | Combien de jours du planning de chaque enfant sont lus, aujourd'hui compris (7 par défaut).                                                              |
-| Fuseau horaire                 | Ce qui décide d'« aujourd'hui » et de « demain » : `Europe/Paris` par défaut, `Indian/Reunion`, `America/Martinique`… pour l'outre-mer.                  |
+| Champ                          | Ce qu'il faut mettre                                                                                                                                                                                                            |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Adresse du portail             | L'adresse de la page de connexion du portail, copiée telle quelle : `https://espacefamille.aiga.fr/index.html?dossier=1626256#connexion…` ou `https://espacefamille.aiga.fr/11578177`. Le numéro seul (`1626256`) suffit aussi. |
+| E-mail                         | L'e-mail avec lequel vous vous connectez au portail.                                                                                                                                                                            |
+| Mot de passe                   | Le mot de passe du portail. Il n'est envoyé qu'au serveur de connexion d'AIGA et n'est jamais écrit dans les journaux.                                                                                                          |
+| Intervalle de rafraîchissement | Toutes les combien de minutes le portail est lu (60 par défaut, de 15 à 1440).                                                                                                                                                  |
+| Rappel de facture              | Combien de jours avant l'échéance le déclencheur « Une facture arrive à échéance » se déclenche (3 par défaut).                                                                                                                 |
+| Planning lu à l'avance         | Combien de jours du planning de chaque enfant sont lus, aujourd'hui compris (7 par défaut).                                                                                                                                     |
+| Fuseau horaire                 | Ce qui décide d'« aujourd'hui » et de « demain » : `Europe/Paris` par défaut, `Indian/Reunion`, `America/Martinique`… pour l'outre-mer.                                                                                         |
 
 Cliquez sur **Tester la connexion** : la réponse donne le nom de la structure, le montant dû et,
 pour chaque enfant, les jours réservés et la prochaine réservation.
@@ -39,7 +39,7 @@ Ouvrez ensuite l'onglet **Découverte** de l'intégration et créez les appareil
 
 > **Où trouver l'adresse du portail ?** Dans l'e-mail de création de compte envoyé par votre
 > structure, ou dans la barre d'adresse de votre navigateur quand vous êtes sur le portail :
-> c'est le nombre après `espacefamille.aiga.fr/`.
+> c'est le nombre après `dossier=` (ou après `espacefamille.aiga.fr/`).
 
 ## Les appareils
 
