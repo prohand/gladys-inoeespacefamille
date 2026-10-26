@@ -1,0 +1,126 @@
+# iNoé Espace Famille pour Gladys
+
+Cette intégration relie Gladys à votre **Espace Famille iNoé** (le portail famille d'AIGA
+utilisé par de nombreuses communes et structures : cantine, périscolaire, accueil de loisirs,
+crèche). Elle lit, comme vous le feriez sur le portail :
+
+- le **montant à payer** et les **factures** en attente ;
+- les **réservations** de chaque enfant (aujourd'hui, demain, les jours suivants) ;
+- les **actualités** publiées par la structure ;
+- le nombre de **documents** que la structure attend.
+
+L'intégration **ne fait que lire** : elle ne réserve, n'annule et ne paie jamais rien. Les
+paiements et les réservations restent sur le portail.
+
+C'est une intégration **cloud** : elle passe par les serveurs d'AIGA sur Internet. Gladys doit
+donc avoir accès à Internet.
+
+Gladys 5.3 ou plus récent est nécessaire.
+
+## Configuration
+
+Dans Gladys, ouvrez **Intégrations**, installez **iNoé Espace Famille**, puis remplissez l'écran
+de configuration :
+
+| Champ                          | Ce qu'il faut mettre                                                                                                                                     |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Adresse du portail             | L'adresse que votre structure vous a envoyée par e-mail, par exemple `https://espacefamille.aiga.fr/11578177`. Le numéro seul (`11578177`) suffit aussi. |
+| E-mail                         | L'e-mail avec lequel vous vous connectez au portail.                                                                                                     |
+| Mot de passe                   | Le mot de passe du portail. Il n'est envoyé qu'au serveur de connexion d'AIGA et n'est jamais écrit dans les journaux.                                   |
+| Intervalle de rafraîchissement | Toutes les combien de minutes le portail est lu (60 par défaut, de 15 à 1440).                                                                           |
+| Rappel de facture              | Combien de jours avant l'échéance le déclencheur « Une facture arrive à échéance » se déclenche (3 par défaut).                                          |
+| Planning lu à l'avance         | Combien de jours du planning de chaque enfant sont lus, aujourd'hui compris (7 par défaut).                                                              |
+| Fuseau horaire                 | Ce qui décide d'« aujourd'hui » et de « demain » : `Europe/Paris` par défaut, `Indian/Reunion`, `America/Martinique`… pour l'outre-mer.                  |
+
+Cliquez sur **Tester la connexion** : la réponse donne le nom de la structure, le montant dû et,
+pour chaque enfant, les jours réservés et la prochaine réservation.
+
+Ouvrez ensuite l'onglet **Découverte** de l'intégration et créez les appareils.
+
+> **Où trouver l'adresse du portail ?** Dans l'e-mail de création de compte envoyé par votre
+> structure, ou dans la barre d'adresse de votre navigateur quand vous êtes sur le portail :
+> c'est le nombre après `espacefamille.aiga.fr/`.
+
+## Les appareils
+
+### La famille
+
+Un appareil au nom de la structure (et de votre famille) :
+
+| Fonctionnalité     | Valeur                                                 |
+| ------------------ | ------------------------------------------------------ |
+| Amount due         | Montant restant à payer, en euros                      |
+| Unpaid invoices    | Nombre de factures à payer                             |
+| Next due date      | Date d'échéance de la prochaine facture (`AAAA-MM-JJ`) |
+| Documents expected | Nombre de documents que la structure attend            |
+| Latest news        | Titre de la dernière actualité de la structure         |
+
+### Chaque enfant
+
+Un appareil par enfant (« Léa – iNoé ») :
+
+| Fonctionnalité    | Valeur                                                           |
+| ----------------- | ---------------------------------------------------------------- |
+| Booked today      | 1 si l'enfant a au moins une réservation aujourd'hui, sinon 0    |
+| Booked tomorrow   | 1 si l'enfant a au moins une réservation demain, sinon 0         |
+| Today             | Les activités réservées aujourd'hui (« Cantine, Garderie soir ») |
+| Tomorrow          | Les activités réservées demain                                   |
+| Days booked ahead | Nombre de jours réservés sur la période lue                      |
+
+Une absence ou une place en liste d'attente ne compte pas comme une réservation.
+
+Chaque appareil affiche le badge **cloud** ; il passe à **injoignable** quand le portail ne
+répond pas.
+
+## Déclencheurs de scène
+
+Dans une scène, choisissez le déclencheur **Intégrations → iNoé Espace Famille** :
+
+| Clé                | Quand                                                             | Variables                                                         |
+| ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `new_invoice`      | Une nouvelle facture à payer apparaît                             | `number`, `label`, `structure`, `amount`, `due_date`              |
+| `invoice_due_soon` | Une facture arrive à échéance (une seule fois par facture)        | les mêmes + `days_left`                                           |
+| `booking_changed`  | Une activité est réservée ou annulée dans le planning d'un enfant | `child_name`, `date`, `activity`, `change` (`booked`/`cancelled`) |
+| `new_message`      | La structure publie une nouvelle actualité                        | `title`, `date`                                                   |
+
+Le déclencheur `booking_changed` peut être filtré sur un enfant et sur le type de changement.
+Dans les actions suivantes, utilisez par exemple `{{triggerEvent.data.amount}}`.
+
+À la toute première lecture d'un compte, rien n'est signalé (sinon chaque facture déjà là serait
+« nouvelle ») — sauf une facture qui arrive déjà à échéance.
+
+## Actions de scène
+
+| Clé             | Ce qu'elle fait                                                              | Résultats                       |
+| --------------- | ---------------------------------------------------------------------------- | ------------------------------- |
+| `refresh`       | Lit le portail tout de suite, sans attendre l'intervalle                     | `amount_due`, `unpaid_invoices` |
+| `check_booking` | Dit si un enfant est réservé aujourd'hui ou demain, et sur quelles activités | `booked`, `activities`          |
+
+Exemple : chaque soir à 20 h, `check_booking` pour Léa, demain ; si `booked` est vrai, envoyer
+« Demain : {{…activities}} » sur Telegram.
+
+## Widget du tableau de bord
+
+Le widget **Espace Famille** (`family_space`) montre le montant dû (en direct), la prochaine
+facture (orange quand l'échéance approche, rouge quand elle est passée), la journée de chaque
+enfant aujourd'hui et demain, et les documents attendus. Le bouton **Actualiser** relit le
+portail ; **Ouvrir le portail** ouvre votre Espace Famille.
+
+## En cas de problème
+
+| Message                                             | Que faire                                                                                           |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| « Cette adresse de portail est inconnue d'iNoé »    | Recopiez l'adresse depuis l'e-mail de votre structure.                                              |
+| « Le portail a refusé l'e-mail ou le mot de passe » | Connectez-vous sur le portail lui-même ; si le mot de passe a changé, mettez-le à jour dans Gladys. |
+| « Le portail iNoé est en maintenance »              | Rien à faire : nouvel essai au prochain rafraîchissement.                                           |
+| Un enfant affiche « planning illisible »            | Sa structure a peut-être fermé une activité. Les autres informations restent à jour.                |
+
+Le portail n'a pas d'API publique : l'intégration utilise les mêmes échanges que le site web.
+Si AIGA change son site, une mise à jour de l'intégration peut être nécessaire.
+
+## Confidentialité
+
+- Le mot de passe n'est envoyé qu'à `ism.aiga.fr` (le serveur de connexion d'AIGA).
+- Rien n'est envoyé ailleurs qu'aux serveurs d'AIGA et à votre Gladys.
+- Seule une petite mémoire (numéros de factures, d'actualités, réservations déjà vues) est
+  gardée dans le volume `/data` de l'intégration, pour ne pas signaler deux fois la même chose.

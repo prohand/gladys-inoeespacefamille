@@ -1,0 +1,655 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "iNoé Espace Famille",
+  "description": {
+    "en": "Invoices, bookings and news of your iNoé Espace Famille portal (canteen, after-school, nursery).",
+    "fr": "Factures, réservations et actualités de votre Espace Famille iNoé (cantine, périscolaire, crèche).",
+    "de": "Rechnungen, Buchungen und Neuigkeiten Ihres iNoé-Familienportals (Kantine, Hort, Krippe).",
+    "es": "Facturas, reservas y noticias de su portal iNoé Espace Famille (comedor, extraescolar, guardería)."
+  },
+  "version": "0.0.0",
+  "docker_image": "ghcr.io/prohand/gladys-inoeespacefamille:0.0.0",
+  "gladys_version": ">=5.3.0",
+  "cover_image": "https://raw.githubusercontent.com/prohand/gladys-inoeespacefamille/main/cover.png",
+  "categories": ["services"],
+  "keywords": [
+    "aiga",
+    "inoe",
+    "espace famille",
+    "portail famille",
+    "cantine",
+    "périscolaire",
+    "centre de loisirs",
+    "crèche",
+    "facture",
+    "réservation"
+  ],
+  "countries": ["FR"],
+  "transports": ["cloud"],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Getting started",
+        "fr": "Pour commencer",
+        "de": "Erste Schritte",
+        "es": "Primeros pasos"
+      },
+      "description": {
+        "en": "Use the same address, email and password as on the iNoé Espace Famille portal of your town or structure. The integration only reads: it never books, cancels or pays anything. It talks to the AIGA servers over the Internet (cloud).",
+        "fr": "Utilisez la même adresse, le même e-mail et le même mot de passe que sur le portail Espace Famille iNoé de votre commune ou structure. L'intégration ne fait que lire : elle ne réserve, n'annule et ne paie jamais rien. Elle passe par les serveurs d'AIGA sur Internet (cloud).",
+        "de": "Verwenden Sie dieselbe Adresse, E-Mail und dasselbe Passwort wie im iNoé-Familienportal Ihrer Gemeinde oder Einrichtung. Die Integration liest nur: Sie bucht, storniert oder bezahlt nie etwas. Sie spricht über das Internet mit den Servern von AIGA (Cloud).",
+        "es": "Use la misma dirección, correo y contraseña que en el portal iNoé Espace Famille de su municipio o centro. La integración solo lee: nunca reserva, cancela ni paga nada. Se comunica con los servidores de AIGA por Internet (nube)."
+      },
+      "links": [
+        {
+          "url": "https://espacefamille.aiga.fr",
+          "label": {
+            "en": "iNoé Espace Famille",
+            "fr": "Espace Famille iNoé",
+            "de": "iNoé Espace Famille",
+            "es": "iNoé Espace Famille"
+          }
+        },
+        {
+          "url": "https://github.com/prohand/gladys-inoeespacefamille/blob/main/docs/en.md",
+          "label": {
+            "en": "Integration documentation",
+            "fr": "Documentation de l'intégration",
+            "de": "Dokumentation der Integration",
+            "es": "Documentación de la integración"
+          }
+        }
+      ]
+    },
+    {
+      "key": "portal_url",
+      "type": "string",
+      "label": {
+        "en": "Portal address",
+        "fr": "Adresse du portail",
+        "de": "Portaladresse",
+        "es": "Dirección del portal"
+      },
+      "description": {
+        "en": "The address of your portal as your structure sent it, e.g. https://espacefamille.aiga.fr/11578177 — or just the number at its end.",
+        "fr": "L'adresse de votre portail telle que votre structure vous l'a envoyée, par exemple https://espacefamille.aiga.fr/11578177 — ou seulement le numéro à la fin.",
+        "de": "Die Adresse Ihres Portals, wie Ihre Einrichtung sie geschickt hat, z. B. https://espacefamille.aiga.fr/11578177 — oder nur die Nummer am Ende.",
+        "es": "La dirección de su portal tal como se la envió su centro, p. ej. https://espacefamille.aiga.fr/11578177 — o solo el número del final."
+      },
+      "placeholder": {
+        "en": "https://espacefamille.aiga.fr/11578177",
+        "fr": "https://espacefamille.aiga.fr/11578177",
+        "de": "https://espacefamille.aiga.fr/11578177",
+        "es": "https://espacefamille.aiga.fr/11578177"
+      },
+      "required": true
+    },
+    {
+      "key": "username",
+      "type": "string",
+      "label": {
+        "en": "Email",
+        "fr": "E-mail",
+        "de": "E-Mail",
+        "es": "Correo electrónico"
+      },
+      "description": {
+        "en": "The email you sign in to the portal with.",
+        "fr": "L'e-mail avec lequel vous vous connectez au portail.",
+        "de": "Die E-Mail, mit der Sie sich im Portal anmelden.",
+        "es": "El correo con el que inicia sesión en el portal."
+      },
+      "placeholder": {
+        "en": "name@example.com",
+        "fr": "nom@exemple.fr",
+        "de": "name@beispiel.de",
+        "es": "nombre@ejemplo.es"
+      },
+      "required": true
+    },
+    {
+      "key": "password",
+      "type": "secret",
+      "label": {
+        "en": "Password",
+        "fr": "Mot de passe",
+        "de": "Passwort",
+        "es": "Contraseña"
+      },
+      "description": {
+        "en": "The password of the portal. It is only sent to the AIGA sign-in server, and never written to the logs.",
+        "fr": "Le mot de passe du portail. Il n'est envoyé qu'au serveur de connexion d'AIGA, et jamais écrit dans les journaux.",
+        "de": "Das Passwort des Portals. Es wird nur an den Anmeldeserver von AIGA gesendet und nie in die Protokolle geschrieben.",
+        "es": "La contraseña del portal. Solo se envía al servidor de inicio de sesión de AIGA y nunca se escribe en los registros."
+      },
+      "required": true
+    },
+    {
+      "key": "refresh_minutes",
+      "type": "number",
+      "label": {
+        "en": "Refresh interval (min)",
+        "fr": "Intervalle de rafraîchissement (min)",
+        "de": "Aktualisierungsintervall (min)",
+        "es": "Intervalo de actualización (min)"
+      },
+      "description": {
+        "en": "How often the portal is read, in minutes (15 to 1440).",
+        "fr": "Fréquence de lecture du portail, en minutes (15 à 1440).",
+        "de": "Wie oft das Portal gelesen wird, in Minuten (15 bis 1440).",
+        "es": "Frecuencia de lectura del portal, en minutos (15 a 1440)."
+      },
+      "required": false,
+      "default": 60,
+      "min": 15,
+      "max": 1440
+    },
+    {
+      "key": "reminder_days",
+      "type": "number",
+      "label": {
+        "en": "Invoice reminder (days)",
+        "fr": "Rappel de facture (jours)",
+        "de": "Rechnungserinnerung (Tage)",
+        "es": "Recordatorio de factura (días)"
+      },
+      "description": {
+        "en": "The \"Invoice due soon\" trigger fires once per invoice, this many days before it is due (0 = on the day).",
+        "fr": "Le déclencheur « Facture bientôt due » se déclenche une fois par facture, ce nombre de jours avant l'échéance (0 = le jour même).",
+        "de": "Der Auslöser „Rechnung bald fällig“ wird einmal pro Rechnung so viele Tage vor der Fälligkeit ausgelöst (0 = am selben Tag).",
+        "es": "El disparador «Factura próxima a vencer» se activa una vez por factura, este número de días antes del vencimiento (0 = el mismo día)."
+      },
+      "required": false,
+      "default": 3,
+      "min": 0,
+      "max": 30
+    },
+    {
+      "key": "planning_days",
+      "type": "number",
+      "label": {
+        "en": "Planning read ahead (days)",
+        "fr": "Planning lu à l'avance (jours)",
+        "de": "Vorausgelesene Planung (Tage)",
+        "es": "Planificación leída por adelantado (días)"
+      },
+      "description": {
+        "en": "How many days of each child's planning are read, today included (1 to 31).",
+        "fr": "Nombre de jours du planning de chaque enfant qui sont lus, aujourd'hui compris (1 à 31).",
+        "de": "Wie viele Tage der Planung jedes Kindes gelesen werden, heute eingeschlossen (1 bis 31).",
+        "es": "Cuántos días de la planificación de cada niño se leen, hoy incluido (1 a 31)."
+      },
+      "required": false,
+      "default": 7,
+      "min": 1,
+      "max": 31
+    },
+    {
+      "key": "timezone",
+      "type": "string",
+      "label": {
+        "en": "Time zone",
+        "fr": "Fuseau horaire",
+        "de": "Zeitzone",
+        "es": "Zona horaria"
+      },
+      "description": {
+        "en": "The time zone of the family, which decides what \"today\" and \"tomorrow\" are. An IANA name such as Europe/Paris or Indian/Reunion.",
+        "fr": "Le fuseau horaire de la famille, qui décide de ce que sont « aujourd'hui » et « demain ». Un nom IANA comme Europe/Paris ou Indian/Reunion.",
+        "de": "Die Zeitzone der Familie, die bestimmt, was „heute“ und „morgen“ ist. Ein IANA-Name wie Europe/Paris oder Indian/Reunion.",
+        "es": "La zona horaria de la familia, que decide qué son «hoy» y «mañana». Un nombre IANA como Europe/Paris o Indian/Reunion."
+      },
+      "placeholder": {
+        "en": "Europe/Paris",
+        "fr": "Europe/Paris",
+        "de": "Europe/Paris",
+        "es": "Europe/Paris"
+      },
+      "required": false,
+      "default": "Europe/Paris"
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
+      "timeout_seconds": 60
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "new_invoice",
+      "label": {
+        "en": "A new invoice is available",
+        "fr": "Une nouvelle facture est disponible",
+        "de": "Eine neue Rechnung ist verfügbar",
+        "es": "Hay una nueva factura disponible"
+      },
+      "description": {
+        "en": "The portal shows an invoice to pay that was not there at the last read.",
+        "fr": "Le portail affiche une facture à payer qui n'y était pas à la dernière lecture.",
+        "de": "Das Portal zeigt eine zu zahlende Rechnung, die beim letzten Lesen noch nicht da war.",
+        "es": "El portal muestra una factura por pagar que no estaba en la última lectura."
+      },
+      "variables": [
+        {
+          "key": "number",
+          "type": "string",
+          "label": {
+            "en": "Invoice number",
+            "fr": "Numéro de facture",
+            "de": "Rechnungsnummer",
+            "es": "Número de factura"
+          }
+        },
+        {
+          "key": "label",
+          "type": "string",
+          "label": {
+            "en": "Invoice title",
+            "fr": "Intitulé de la facture",
+            "de": "Bezeichnung der Rechnung",
+            "es": "Título de la factura"
+          }
+        },
+        {
+          "key": "structure",
+          "type": "string",
+          "label": {
+            "en": "Service",
+            "fr": "Service",
+            "de": "Dienst",
+            "es": "Servicio"
+          }
+        },
+        {
+          "key": "amount",
+          "type": "number",
+          "label": {
+            "en": "Amount to pay (€)",
+            "fr": "Montant à payer (€)",
+            "de": "Zu zahlender Betrag (€)",
+            "es": "Importe por pagar (€)"
+          }
+        },
+        {
+          "key": "due_date",
+          "type": "string",
+          "label": {
+            "en": "Due date",
+            "fr": "Date d'échéance",
+            "de": "Fälligkeitsdatum",
+            "es": "Fecha de vencimiento"
+          }
+        }
+      ]
+    },
+    {
+      "key": "invoice_due_soon",
+      "label": {
+        "en": "An invoice is due soon",
+        "fr": "Une facture arrive à échéance",
+        "de": "Eine Rechnung wird bald fällig",
+        "es": "Una factura vence pronto"
+      },
+      "description": {
+        "en": "An invoice still to pay is due within the reminder days of the configuration. Fires once per invoice.",
+        "fr": "Une facture encore à payer arrive à échéance dans le délai de rappel de la configuration. Une fois par facture.",
+        "de": "Eine noch zu zahlende Rechnung wird innerhalb der Erinnerungstage der Konfiguration fällig. Einmal pro Rechnung.",
+        "es": "Una factura aún por pagar vence dentro de los días de recordatorio de la configuración. Una vez por factura."
+      },
+      "variables": [
+        {
+          "key": "number",
+          "type": "string",
+          "label": {
+            "en": "Invoice number",
+            "fr": "Numéro de facture",
+            "de": "Rechnungsnummer",
+            "es": "Número de factura"
+          }
+        },
+        {
+          "key": "label",
+          "type": "string",
+          "label": {
+            "en": "Invoice title",
+            "fr": "Intitulé de la facture",
+            "de": "Bezeichnung der Rechnung",
+            "es": "Título de la factura"
+          }
+        },
+        {
+          "key": "structure",
+          "type": "string",
+          "label": {
+            "en": "Service",
+            "fr": "Service",
+            "de": "Dienst",
+            "es": "Servicio"
+          }
+        },
+        {
+          "key": "amount",
+          "type": "number",
+          "label": {
+            "en": "Amount to pay (€)",
+            "fr": "Montant à payer (€)",
+            "de": "Zu zahlender Betrag (€)",
+            "es": "Importe por pagar (€)"
+          }
+        },
+        {
+          "key": "due_date",
+          "type": "string",
+          "label": {
+            "en": "Due date",
+            "fr": "Date d'échéance",
+            "de": "Fälligkeitsdatum",
+            "es": "Fecha de vencimiento"
+          }
+        },
+        {
+          "key": "days_left",
+          "type": "number",
+          "label": {
+            "en": "Days left",
+            "fr": "Jours restants",
+            "de": "Verbleibende Tage",
+            "es": "Días restantes"
+          }
+        }
+      ]
+    },
+    {
+      "key": "booking_changed",
+      "label": {
+        "en": "A child's booking changed",
+        "fr": "Une réservation d'un enfant a changé",
+        "de": "Die Buchung eines Kindes hat sich geändert",
+        "es": "Ha cambiado la reserva de un niño"
+      },
+      "description": {
+        "en": "An activity was booked or cancelled in a child's planning, by you, the other parent or the structure.",
+        "fr": "Une activité a été réservée ou annulée dans le planning d'un enfant, par vous, l'autre parent ou la structure.",
+        "de": "Eine Aktivität wurde in der Planung eines Kindes gebucht oder storniert, von Ihnen, dem anderen Elternteil oder der Einrichtung.",
+        "es": "Se reservó o canceló una actividad en la planificación de un niño, por usted, el otro progenitor o el centro."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Child",
+            "fr": "Enfant",
+            "de": "Kind",
+            "es": "Niño"
+          },
+          "required": false
+        },
+        {
+          "key": "change",
+          "type": "multi_select",
+          "label": {
+            "en": "Change",
+            "fr": "Changement",
+            "de": "Änderung",
+            "es": "Cambio"
+          },
+          "options": [
+            {
+              "value": "booked",
+              "label": {
+                "en": "Booked",
+                "fr": "Réservé",
+                "de": "Gebucht",
+                "es": "Reservado"
+              }
+            },
+            {
+              "value": "cancelled",
+              "label": {
+                "en": "Cancelled",
+                "fr": "Annulé",
+                "de": "Storniert",
+                "es": "Cancelado"
+              }
+            }
+          ],
+          "required": false
+        }
+      ],
+      "variables": [
+        {
+          "key": "child_name",
+          "type": "string",
+          "label": {
+            "en": "Child's name",
+            "fr": "Prénom de l'enfant",
+            "de": "Name des Kindes",
+            "es": "Nombre del niño"
+          }
+        },
+        {
+          "key": "date",
+          "type": "string",
+          "label": {
+            "en": "Day (YYYY-MM-DD)",
+            "fr": "Jour (AAAA-MM-JJ)",
+            "de": "Tag (JJJJ-MM-TT)",
+            "es": "Día (AAAA-MM-DD)"
+          }
+        },
+        {
+          "key": "activity",
+          "type": "string",
+          "label": {
+            "en": "Activity",
+            "fr": "Activité",
+            "de": "Aktivität",
+            "es": "Actividad"
+          }
+        },
+        {
+          "key": "change",
+          "type": "string",
+          "label": {
+            "en": "Change (booked / cancelled)",
+            "fr": "Changement (booked / cancelled)",
+            "de": "Änderung (booked / cancelled)",
+            "es": "Cambio (booked / cancelled)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "new_message",
+      "label": {
+        "en": "A new message from the structure",
+        "fr": "Un nouveau message de la structure",
+        "de": "Eine neue Nachricht der Einrichtung",
+        "es": "Un nuevo mensaje del centro"
+      },
+      "description": {
+        "en": "The structure published a new message in the news feed of the portal.",
+        "fr": "La structure a publié un nouveau message dans le fil d'actualités du portail.",
+        "de": "Die Einrichtung hat eine neue Nachricht im Newsfeed des Portals veröffentlicht.",
+        "es": "El centro publicó un nuevo mensaje en las noticias del portal."
+      },
+      "variables": [
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Title",
+            "fr": "Titre",
+            "de": "Titel",
+            "es": "Título"
+          }
+        },
+        {
+          "key": "date",
+          "type": "string",
+          "label": {
+            "en": "Date (YYYY-MM-DD)",
+            "fr": "Date (AAAA-MM-JJ)",
+            "de": "Datum (JJJJ-MM-TT)",
+            "es": "Fecha (AAAA-MM-DD)"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "refresh",
+      "label": {
+        "en": "Read the iNoé portal now",
+        "fr": "Lire le portail iNoé maintenant",
+        "de": "iNoé-Portal jetzt lesen",
+        "es": "Leer el portal iNoé ahora"
+      },
+      "description": {
+        "en": "Refresh invoices, bookings and news without waiting for the next interval.",
+        "fr": "Actualise factures, réservations et actualités sans attendre le prochain intervalle.",
+        "de": "Aktualisiert Rechnungen, Buchungen und Neuigkeiten, ohne auf das nächste Intervall zu warten.",
+        "es": "Actualiza facturas, reservas y noticias sin esperar al próximo intervalo."
+      },
+      "timeout_seconds": 60,
+      "outputs": [
+        {
+          "key": "amount_due",
+          "type": "number",
+          "label": {
+            "en": "Amount due (€)",
+            "fr": "Montant dû (€)",
+            "de": "Offener Betrag (€)",
+            "es": "Importe pendiente (€)"
+          }
+        },
+        {
+          "key": "unpaid_invoices",
+          "type": "number",
+          "label": {
+            "en": "Invoices to pay",
+            "fr": "Factures à payer",
+            "de": "Zu zahlende Rechnungen",
+            "es": "Facturas por pagar"
+          }
+        }
+      ]
+    },
+    {
+      "key": "check_booking",
+      "label": {
+        "en": "Check a child's booking",
+        "fr": "Vérifier la réservation d'un enfant",
+        "de": "Buchung eines Kindes prüfen",
+        "es": "Comprobar la reserva de un niño"
+      },
+      "description": {
+        "en": "Whether a child is booked today or tomorrow, and on which activities.",
+        "fr": "Indique si un enfant est réservé aujourd'hui ou demain, et sur quelles activités.",
+        "de": "Ob ein Kind heute oder morgen gebucht ist, und für welche Aktivitäten.",
+        "es": "Indica si un niño tiene reserva hoy o mañana, y en qué actividades."
+      },
+      "timeout_seconds": 60,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Child",
+            "fr": "Enfant",
+            "de": "Kind",
+            "es": "Niño"
+          },
+          "required": true
+        },
+        {
+          "key": "day",
+          "type": "select",
+          "label": {
+            "en": "Day",
+            "fr": "Jour",
+            "de": "Tag",
+            "es": "Día"
+          },
+          "options": [
+            {
+              "value": "today",
+              "label": {
+                "en": "Today",
+                "fr": "Aujourd'hui",
+                "de": "Heute",
+                "es": "Hoy"
+              }
+            },
+            {
+              "value": "tomorrow",
+              "label": {
+                "en": "Tomorrow",
+                "fr": "Demain",
+                "de": "Morgen",
+                "es": "Mañana"
+              }
+            }
+          ],
+          "required": true,
+          "default": "today"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "booked",
+          "type": "boolean",
+          "label": {
+            "en": "Booked",
+            "fr": "Réservé",
+            "de": "Gebucht",
+            "es": "Reservado"
+          }
+        },
+        {
+          "key": "activities",
+          "type": "string",
+          "label": {
+            "en": "Activities",
+            "fr": "Activités",
+            "de": "Aktivitäten",
+            "es": "Actividades"
+          }
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "key": "family_space",
+      "label": {
+        "en": "Family space",
+        "fr": "Espace Famille",
+        "de": "Familienbereich",
+        "es": "Espacio familiar"
+      },
+      "description": {
+        "en": "Amount due, next invoice and each child's bookings today and tomorrow.",
+        "fr": "Montant dû, prochaine facture et réservations de chaque enfant aujourd'hui et demain.",
+        "de": "Offener Betrag, nächste Rechnung und Buchungen jedes Kindes heute und morgen.",
+        "es": "Importe pendiente, próxima factura y reservas de cada niño hoy y mañana."
+      },
+      "icon": "users",
+      "action_timeout_seconds": 60
+    }
+  ]
+}
