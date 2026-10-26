@@ -71,7 +71,7 @@ application (`https://espacefamille.aiga.fr`), read-only:
    names (`describeShape`), never their values.
 4. Data, with `token=null` and the cookies: `POST tableaudebordController/infos/` (dashboard:
    `familleFacturesMontant`, `familleDocumentsAttendus`, `familleVO.listeEnfants`),
-   `GET factureController/factures`, `GET filactuController/messages/`,
+   `GET factureController/factures?panier=false&limit=50`, `GET public/filactuController/messages/`,
    `GET pointageANController/events/?idIndividu&dateDebut&dateFin` and
    `GET pointageANController/plageFonctionnements/` (same params: activity names).
 
@@ -98,6 +98,9 @@ A 401/403 on a data call = session expired: log in again once (`withSession`).
 - **Transport badge**: `cloud` after a good read, `unreachable` after a failed one. The manifest
   declares `"transports": ["cloud"]` (one channel: no "prefer local" toggle).
 - **Every feature declares `min`/`max`** (NOT NULL in Gladys), text features included.
+- **A category/type alone in its device is labelled by Gladys with its translation**, not with
+  the feature name: only use such a unique pair when Gladys translates it (`currency/decimal`,
+  `duration/integer`), or `undefined` shows on the dashboard (test in `service.test.js`).
 - Gladys 5.3+ (`keywords`, `countries`); 5.1+ for the widget and scenes.
 
 ### Manifest

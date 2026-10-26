@@ -393,7 +393,9 @@ export class InoeClient {
 
   /** The invoices still to pay. */
   async invoices() {
-    return this.store('factureController/factures');
+    // As the portal's invoice screen asks: the invoices to pay, not the
+    // cart (`panier`), by pages of 50 (its own `factureLimit`).
+    return this.store('factureController/factures', { panier: 'false', limit: '50' });
   }
 
   /** The planning of one person between two dates (YYYY-MM-DD, inclusive). */
@@ -408,7 +410,7 @@ export class InoeClient {
 
   /** The structure's news feed. */
   async news() {
-    return this.store('filactuController/messages/');
+    return this.store('public/filactuController/messages/');
   }
 
   /**

@@ -10,7 +10,11 @@
 // id: renaming a child in the portal keeps the same device in Gladys.
 // -----------------------------------------------------------------------------
 
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '@gladysassistant/integration-sdk';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+} from '@gladysassistant/integration-sdk';
 
 export const DEVICE_TYPE = 'child';
 
@@ -61,8 +65,13 @@ export function buildChildDevice(gladys, snapshot, child) {
       {
         name: 'Days booked ahead',
         external_id: ids.feature(CHILD_FEATURES.BOOKED_DAYS),
-        category: DEVICE_FEATURE_CATEGORIES.UNKNOWN,
-        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        // A feature whose category/type is the only one of its device is
+        // labelled by Gladys with the translation of that category/type, not
+        // its name: `unknown`/`integer` has none ("undefined"), a duration in
+        // days reads "Duration (integer)" with its "d" unit.
+        category: DEVICE_FEATURE_CATEGORIES.DURATION,
+        type: DEVICE_FEATURE_TYPES.DURATION.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.DAYS,
         min: 0,
         max: 31,
         read_only: true,

@@ -158,8 +158,12 @@ export function createFakeInoe() {
       case 'tableaudebordController/infos/':
         return json({ success: true, data: [fake.dashboard] });
       case 'factureController/factures':
+        // The real portal fails without the parameter its screen sends.
+        if (query.get('panier') !== 'false') {
+          return reply(500, 'panier');
+        }
         return json({ success: true, data: fake.invoices, totalCount: fake.invoices.length });
-      case 'filactuController/messages/':
+      case 'public/filactuController/messages/':
         return json({ success: true, data: fake.news });
       case 'pointageANController/plageFonctionnements/':
         return json({ success: true, data: fake.slots });

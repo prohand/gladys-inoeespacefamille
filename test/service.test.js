@@ -144,3 +144,22 @@ test('after a failure the next refresh finds the build again', async () => {
     `https://espacefamille.aiga.fr/inoe/inoe${inoe.build}/api/EF/`,
   );
 });
+
+// Gladys labels a feature whose category/type is the only one of its device
+// with the translation of that category/type, not with its name. These are
+// the pairs the Gladys frontend translates among the ones used here; any other
+// unique pair shows "undefined" on the dashboard.
+const TRANSLATED_UNIQUE_PAIRS = ['currency/decimal', 'duration/integer'];
+
+test('no feature is labelled "undefined" on the Gladys dashboard', async () => {
+  const { gladys, service } = await setup();
+  await service.refresh();
+  for (const device of gladys.fake.discoveredDevices) {
+    const pairs = device.features.map((feature) => `${feature.category}/${feature.type}`);
+    for (const pair of pairs) {
+      if (pairs.filter((other) => other === pair).length === 1) {
+        assert.ok(TRANSLATED_UNIQUE_PAIRS.includes(pair), `${device.name}: ${pair} is unique`);
+      }
+    }
+  }
+});
