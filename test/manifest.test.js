@@ -10,6 +10,7 @@ import { readFile } from 'node:fs/promises';
 import { DEFAULT_CONFIG } from '../src/config.js';
 import {
   BOOKING_CHANGES,
+  BOOKINGS_WIDGET,
   CHECK_DAYS,
   FAMILY_WIDGET,
   SCENE_ACTIONS,
@@ -181,13 +182,15 @@ test('the manifest declares the cloud transport only: the portal is on the Inter
   assert.deepEqual(manifest.transports, ['cloud']);
 });
 
-test('the widget and the scene actions are handled in index.js', () => {
+test('the widgets and the scene actions are handled in index.js', () => {
   assert.deepEqual(
     manifest.widgets.map((widget) => widget.key),
-    [FAMILY_WIDGET],
+    [FAMILY_WIDGET, BOOKINGS_WIDGET],
   );
-  assert.match(indexSource, /onWidgetGet\(FAMILY_WIDGET/);
-  assert.match(indexSource, /onWidgetAction\(FAMILY_WIDGET/);
+  for (const key of ['FAMILY_WIDGET', 'BOOKINGS_WIDGET']) {
+    assert.match(indexSource, new RegExp(`onWidgetGet\\(${key}`));
+    assert.match(indexSource, new RegExp(`onWidgetAction\\(${key}`));
+  }
   assert.deepEqual(
     manifest.scene_actions.map((action) => action.key).sort(),
     Object.values(SCENE_ACTIONS).sort(),
@@ -265,6 +268,7 @@ test('the user documentation exists in every language', async () => {
       ...Object.values(SCENE_TRIGGERS),
       ...Object.values(SCENE_ACTIONS),
       FAMILY_WIDGET,
+      BOOKINGS_WIDGET,
     ]) {
       assert.ok(text.includes(`\`${key}\``), `docs/${language}.md does not name \`${key}\``);
     }

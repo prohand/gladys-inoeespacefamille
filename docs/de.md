@@ -105,6 +105,12 @@ Rechnung (orange, wenn die Fälligkeit naht, rot, wenn sie überschritten ist), 
 Kindes heute und morgen sowie die erwarteten Dokumente. Die Schaltfläche **Aktualisieren** liest
 das Portal erneut; **Portal öffnen** öffnet Ihr Espace Famille.
 
+Das Widget **Nächste Buchungen** (`upcoming_bookings`) listet die gebuchten Tage der kommenden
+Tage auf (Einstellung **Vorausgelesene Planung (Tage)**), eine Karte pro Tag, höchstens 8: die gebuchten
+Kinder und ihre Zeitfenster, „Heute“ und „Morgen“ farbig. Tippen Sie auf eine Karte, um die
+Aktivitäten jedes Kindes vollständig zu sehen. Es hat dieselben Schaltflächen **Aktualisieren**
+und **Portal öffnen**.
+
 ## Fehlerbehebung
 
 | Meldung                                                 | Was tun                                                                                              |

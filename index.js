@@ -16,7 +16,7 @@
 
 import { GladysIntegration, logger } from '@gladysassistant/integration-sdk';
 import { createSceneActions } from './src/capabilities/scenes.js';
-import { FAMILY_WIDGET, SCENE_ACTIONS } from './src/capabilities/keys.js';
+import { BOOKINGS_WIDGET, FAMILY_WIDGET, SCENE_ACTIONS } from './src/capabilities/keys.js';
 import { createWidgets, refreshWidget } from './src/capabilities/widget.js';
 import { errorMessage, testReport } from './src/messages.js';
 import { Service } from './src/service.js';
@@ -65,6 +65,8 @@ gladys.onSceneAction(SCENE_ACTIONS.CHECK_BOOKING, sceneActions[SCENE_ACTIONS.CHE
 const widgets = createWidgets(service);
 gladys.onWidgetGet(FAMILY_WIDGET, () => widgets[FAMILY_WIDGET].get());
 gladys.onWidgetAction(FAMILY_WIDGET, (actionKey) => widgets[FAMILY_WIDGET].action(actionKey));
+gladys.onWidgetGet(BOOKINGS_WIDGET, () => widgets[BOOKINGS_WIDGET].get());
+gladys.onWidgetAction(BOOKINGS_WIDGET, (actionKey) => widgets[BOOKINGS_WIDGET].action(actionKey));
 
 // --- Configuration updated by the user ---------------------------------------
 gladys.onConfigUpdated(async (newConfig) => {

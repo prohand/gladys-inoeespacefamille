@@ -6,6 +6,11 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- "Upcoming bookings" dashboard widget: the booked days of the planning window, one card per day
+  with each child's slots, Refresh button and a link to the portal.
+
 ## [1.0.0] - 2026-10-26
 
 ### Added

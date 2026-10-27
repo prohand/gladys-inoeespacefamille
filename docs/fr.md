@@ -106,6 +106,12 @@ facture (orange quand l'échéance approche, rouge quand elle est passée), la j
 enfant aujourd'hui et demain, et les documents attendus. Le bouton **Actualiser** relit le
 portail ; **Ouvrir le portail** ouvre votre Espace Famille.
 
+Le widget **Prochaines réservations** (`upcoming_bookings`) liste les jours réservés des
+prochains jours (le réglage **Planning lu à l'avance (jours)**), une carte par jour, 8 au plus : les
+enfants inscrits et leurs créneaux, « Aujourd'hui » et « Demain » en couleur. Touchez une carte
+pour voir les activités de chaque enfant en entier. Il a les mêmes boutons **Actualiser** et
+**Ouvrir le portail**.
+
 ## En cas de problème
 
 | Message                                             | Que faire                                                                                           |

@@ -32,6 +32,16 @@ export function formatDay(day, language) {
   }).format(new Date(`${day}T12:00:00Z`));
 }
 
+/** A day (YYYY-MM-DD) in full: "Tuesday 27 October", "mardi 27 octobre". */
+export function formatLongDay(day, language) {
+  return new Intl.DateTimeFormat(LOCALES[language] ?? 'en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'UTC',
+  }).format(new Date(`${day}T12:00:00Z`));
+}
+
 const FIELD_NAMES = {
   portal_url: {
     en: 'Portal address',
