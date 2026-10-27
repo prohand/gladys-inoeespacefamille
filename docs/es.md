@@ -106,6 +106,11 @@ próxima factura (naranja cuando se acerca el vencimiento, rojo cuando ha pasado
 niño hoy y mañana, y los documentos esperados. El botón **Actualizar** vuelve a leer el portal;
 **Abrir el portal** abre su Espace Famille.
 
+El widget **Próximas reservas** (`upcoming_bookings`) lista los días reservados de los próximos
+días (el ajuste **Planificación leída por adelantado (días)**), una tarjeta por día, 8 como máximo: los niños
+inscritos y sus franjas, «Hoy» y «Mañana» en color. Toque una tarjeta para ver las actividades
+de cada niño completas. Tiene los mismos botones **Actualizar** y **Abrir el portal**.
+
 ## Solución de problemas
 
 | Mensaje                                       | Qué hacer                                                                          |

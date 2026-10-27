@@ -650,6 +650,23 @@
       },
       "icon": "users",
       "action_timeout_seconds": 60
+    },
+    {
+      "key": "upcoming_bookings",
+      "label": {
+        "en": "Upcoming bookings",
+        "fr": "Prochaines réservations",
+        "de": "Nächste Buchungen",
+        "es": "Próximas reservas"
+      },
+      "description": {
+        "en": "The days booked for your children in the coming days, with their activities.",
+        "fr": "Les jours réservés pour vos enfants dans les prochains jours, avec leurs activités.",
+        "de": "Die gebuchten Tage Ihrer Kinder in den nächsten Tagen, mit ihren Aktivitäten.",
+        "es": "Los días reservados para sus hijos en los próximos días, con sus actividades."
+      },
+      "icon": "calendar",
+      "action_timeout_seconds": 60
     }
   ]
 }

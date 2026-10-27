@@ -29,6 +29,7 @@ export const CHECK_DAYS = {
 };
 
 export const FAMILY_WIDGET = 'family_space';
+export const BOOKINGS_WIDGET = 'upcoming_bookings';
 
 export const WIDGET_ACTIONS = {
   REFRESH: 'refresh',

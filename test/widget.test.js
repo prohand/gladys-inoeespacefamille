@@ -1,8 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateWidgetContent } from '@gladysassistant/integration-sdk';
-import { buildFamilyWidget, createWidgets } from '../src/capabilities/widget.js';
-import { FAMILY_WIDGET, WIDGET_ACTIONS } from '../src/capabilities/keys.js';
+import {
+  buildBookingsWidget,
+  buildFamilyWidget,
+  createWidgets,
+} from '../src/capabilities/widget.js';
+import { BOOKINGS_WIDGET, FAMILY_WIDGET, WIDGET_ACTIONS } from '../src/capabilities/keys.js';
 import { setup } from './helpers/setup.js';
 
 test('the widget is rendered exactly as sent, before and after the first read', async () => {
@@ -79,4 +83,54 @@ test('every button action of the content is handled', async () => {
   for (const key of actions) {
     await widget.action(key);
   }
+});
+
+test('the bookings widget shows one card per booked day, in date order', async () => {
+  const { service } = await setup();
+  await service.refresh();
+  const content = buildBookingsWidget(service);
+  assert.deepEqual(validateWidgetContent(content), []);
+  assert.equal(content.components[0].text.fr, 'Les 7 prochains jours');
+  const { items } = content.components.find((c) => c.type === 'card-list');
+  // Monday's canteen and Tuesday's full day; the absence of Wednesday is no booking.
+  assert.deepEqual(
+    items.map((item) => item.title.fr),
+    ['lundi 26 octobre', 'mardi 27 octobre'],
+  );
+  assert.equal(items[0].subtitle, 'Léa : Cantine');
+  assert.equal(items[0].badge.text.fr, "Aujourd'hui");
+  assert.equal(items[1].badge.text.fr, 'Demain');
+  assert.equal(items[1].subtitle, 'Léa : Matin, Repas, Après-midi');
+  assert.match(items[1].description, /^Léa — Accueil de loisirs : Matin, Repas, Après-midi$/);
+  assert.ok(!content.components.some((c) => c.type === 'text' && c.variant === 'body'));
+});
+
+test('the bookings widget says when nothing is booked or a planning is unreadable', async () => {
+  const { inoe, service } = await setup();
+  inoe.events[501] = [];
+  await service.refresh();
+  let content = buildBookingsWidget(service);
+  assert.deepEqual(validateWidgetContent(content), []);
+  assert.ok(!content.components.some((c) => c.type === 'card-list'));
+  assert.ok(
+    content.components.some((c) => c.type === 'text' && /Aucune réservation/.test(c.text.fr)),
+  );
+
+  inoe.failPlanningOf = '502';
+  await service.refresh();
+  content = buildBookingsWidget(service);
+  assert.deepEqual(validateWidgetContent(content), []);
+  assert.ok(content.components.some((c) => c.type === 'text' && /illisible : Tom/.test(c.text.fr)));
+});
+
+test('the bookings widget waits for the first read and has a working Refresh button', async () => {
+  const { service } = await setup();
+  const waiting = buildBookingsWidget(service);
+  assert.deepEqual(validateWidgetContent(waiting), []);
+  assert.match(waiting.components[0].text.fr, /première lecture/);
+
+  const widget = createWidgets(service)[BOOKINGS_WIDGET];
+  const toast = await widget.action(WIDGET_ACTIONS.REFRESH);
+  assert.match(toast.fr, /Actualisé/);
+  assert.ok(service.snapshot);
 });

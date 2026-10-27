@@ -10,6 +10,9 @@
 // renders it with its own theme and translations. The computed rows change
 // with each read of the portal, so the sync loop nudges the widget after
 // every refresh (`refreshWidget`) and the TTL is only a safety net.
+//
+// Widget "Upcoming bookings": the booked days of the planning window, one
+// card per day (every child in it), same Refresh button and portal link.
 // -----------------------------------------------------------------------------
 
 import { createLogger, WIDGET_COLORS } from '@gladysassistant/integration-sdk';
@@ -17,23 +20,83 @@ import { parseDossierId } from '../config.js';
 import { FAMILY_FEATURES, familyIds } from '../devices/family.js';
 import { localize, pick } from '../i18n.js';
 import { PORTAL_URL } from '../inoe/client.js';
-import { compactBookings, daysBetween } from '../inoe/parse.js';
-import { errorMessage, formatAmount, formatDay, refreshedMessage } from '../messages.js';
-import { FAMILY_WIDGET, WIDGET_ACTIONS } from './keys.js';
+import { compactBookings, daysBetween, describeBookings } from '../inoe/parse.js';
+import {
+  errorMessage,
+  formatAmount,
+  formatDay,
+  formatLongDay,
+  refreshedMessage,
+} from '../messages.js';
+import { BOOKINGS_WIDGET, FAMILY_WIDGET, WIDGET_ACTIONS } from './keys.js';
 
 const logger = createLogger({ name: 'widget' });
 
 // Status labels and values hold at most 40 characters.
 const MAX_STATUS_TEXT = 40;
+// Card titles and subtitles hold at most 60.
+const MAX_CARD_TEXT = 60;
+// A card list shown as rows holds at most 8 cards.
+const MAX_CARDS = 8;
 
-function clip(text) {
-  return text.length > MAX_STATUS_TEXT ? `${text.slice(0, MAX_STATUS_TEXT - 1)}…` : text;
+function clip(text, max = MAX_STATUS_TEXT) {
+  return text.length > max ? `${text.slice(0, max - 1)}…` : text;
 }
 
-function clipAll(texts) {
+function clipAll(texts, max = MAX_STATUS_TEXT) {
   return Object.fromEntries(
-    Object.entries(texts).map(([language, text]) => [language, clip(text)]),
+    Object.entries(texts).map(([language, text]) => [language, clip(text, max)]),
   );
+}
+
+/** Refresh, and the portal link when the address names a structure. */
+function widgetButtons(config) {
+  const dossierId = parseDossierId(config.portal_url);
+  return [
+    {
+      type: 'button',
+      label: { en: 'Refresh', fr: 'Actualiser', de: 'Aktualisieren', es: 'Actualizar' },
+      icon: 'refresh-cw',
+      style: 'secondary',
+      action: { key: WIDGET_ACTIONS.REFRESH },
+    },
+    ...(dossierId
+      ? [
+          {
+            type: 'button',
+            label: {
+              en: 'Open the portal',
+              fr: 'Ouvrir le portail',
+              de: 'Portal öffnen',
+              es: 'Abrir el portal',
+            },
+            icon: 'external-link',
+            link: { url: `${PORTAL_URL}/${dossierId}` },
+          },
+        ]
+      : []),
+  ];
+}
+
+/** The content before the first good read: the error, or "waiting". */
+function waitingWidget(service, buttons) {
+  const error = service.lastErrorMessage();
+  return {
+    ttl_seconds: 300,
+    components: [
+      {
+        type: 'text',
+        variant: 'body',
+        text: error ?? {
+          en: 'Waiting for the first read of the iNoé portal.',
+          fr: 'En attente de la première lecture du portail iNoé.',
+          de: 'Warte auf das erste Lesen des iNoé-Portals.',
+          es: 'Esperando la primera lectura del portal iNoé.',
+        },
+      },
+      ...buttons,
+    ],
+  };
 }
 
 function nextInvoiceRow(snapshot, config) {
@@ -118,50 +181,9 @@ function childRows(child) {
 /** The widget content for the current state of the service. */
 export function buildFamilyWidget(service) {
   const { snapshot, config } = service;
-  const dossierId = parseDossierId(config.portal_url);
-  const buttons = [
-    {
-      type: 'button',
-      label: { en: 'Refresh', fr: 'Actualiser', de: 'Aktualisieren', es: 'Actualizar' },
-      icon: 'refresh-cw',
-      style: 'secondary',
-      action: { key: WIDGET_ACTIONS.REFRESH },
-    },
-    ...(dossierId
-      ? [
-          {
-            type: 'button',
-            label: {
-              en: 'Open the portal',
-              fr: 'Ouvrir le portail',
-              de: 'Portal öffnen',
-              es: 'Abrir el portal',
-            },
-            icon: 'external-link',
-            link: { url: `${PORTAL_URL}/${dossierId}` },
-          },
-        ]
-      : []),
-  ];
-
+  const buttons = widgetButtons(config);
   if (!snapshot) {
-    const error = service.lastErrorMessage();
-    return {
-      ttl_seconds: 300,
-      components: [
-        {
-          type: 'text',
-          variant: 'body',
-          text: error ?? {
-            en: 'Waiting for the first read of the iNoé portal.',
-            fr: 'En attente de la première lecture du portail iNoé.',
-            de: 'Warte auf das erste Lesen des iNoé-Portals.',
-            es: 'Esperando la primera lectura del portal iNoé.',
-          },
-        },
-        ...buttons,
-      ],
-    };
+    return waitingWidget(service, buttons);
   }
 
   const rows = [
@@ -204,35 +226,159 @@ export function buildFamilyWidget(service) {
   return { ttl_seconds: 1800, components: [...components, ...buttons] };
 }
 
+const BOOKED_DAY_BADGES = {
+  today: {
+    text: { en: 'Today', fr: "Aujourd'hui", de: 'Heute', es: 'Hoy' },
+    color: WIDGET_COLORS.SUCCESS,
+  },
+  tomorrow: {
+    text: { en: 'Tomorrow', fr: 'Demain', de: 'Morgen', es: 'Mañana' },
+    color: WIDGET_COLORS.INFO,
+  },
+};
+
+/**
+ * One card per booked day of the planning window, in date order: the
+ * subtitle names each child's slots, the detail panel each child's
+ * activities in full.
+ */
+function bookedDayCards(snapshot) {
+  const children = snapshot.children.filter((child) => child.planningRead);
+  const days = [...new Set(children.flatMap((child) => Object.keys(child.days)))].sort();
+  const cards = [];
+  for (const day of days) {
+    const booked = children
+      .map((child) => ({ name: child.name, bookings: child.days[day] ?? [] }))
+      .filter(({ bookings }) => bookings.length > 0);
+    if (booked.length === 0) {
+      continue;
+    }
+    // One child in the family: its name would only repeat on every card.
+    const alone = snapshot.children.length === 1;
+    const subtitle = booked
+      .map(({ name, bookings }) =>
+        alone ? compactBookings(bookings) : `${name} : ${compactBookings(bookings)}`,
+      )
+      .join(' · ');
+    const description = booked
+      .map(({ name, bookings }) => `${name} — ${describeBookings(bookings)}`)
+      .join('\n');
+    let badge;
+    if (day === snapshot.today) {
+      badge = BOOKED_DAY_BADGES.today;
+    } else if (day === snapshot.tomorrow) {
+      badge = BOOKED_DAY_BADGES.tomorrow;
+    }
+    cards.push({
+      title: clipAll(
+        localize((language) => formatLongDay(day, language)),
+        MAX_CARD_TEXT,
+      ),
+      subtitle: clip(subtitle, MAX_CARD_TEXT),
+      ...(badge ? { badge } : {}),
+      description,
+    });
+  }
+  return cards.slice(0, MAX_CARDS);
+}
+
+/** The "Upcoming bookings" content for the current state of the service. */
+export function buildBookingsWidget(service) {
+  const { snapshot, config } = service;
+  const buttons = widgetButtons(config);
+  if (!snapshot) {
+    return waitingWidget(service, buttons);
+  }
+
+  const cards = bookedDayCards(snapshot);
+  const days = config.planning_days;
+  const components = [
+    {
+      type: 'text',
+      variant: 'caption',
+      text: {
+        en: days === 1 ? 'Today' : `The next ${days} days`,
+        fr: days === 1 ? "Aujourd'hui" : `Les ${days} prochains jours`,
+        de: days === 1 ? 'Heute' : `Die nächsten ${days} Tage`,
+        es: days === 1 ? 'Hoy' : `Los próximos ${days} días`,
+      },
+    },
+  ];
+  if (cards.length > 0) {
+    components.push({ type: 'card-list', display: 'list', items: cards });
+  }
+
+  // One body text only: the notes are joined into it.
+  const notes = [];
+  if (cards.length === 0) {
+    notes.push({
+      en: 'No booking.',
+      fr: 'Aucune réservation.',
+      de: 'Keine Buchung.',
+      es: 'Ninguna reserva.',
+    });
+  }
+  const unreadable = snapshot.children.filter((child) => !child.planningRead);
+  if (unreadable.length > 0) {
+    const names = unreadable.map((child) => child.name).join(', ');
+    notes.push({
+      en: `Planning unreadable: ${names}.`,
+      fr: `Planning illisible : ${names}.`,
+      de: `Planung nicht lesbar: ${names}.`,
+      es: `Planificación ilegible: ${names}.`,
+    });
+  }
+  const error = service.lastErrorMessage();
+  if (error) {
+    // The last read failed: the cards are those of the read before.
+    notes.push(error);
+  }
+  if (notes.length > 0) {
+    components.push({
+      type: 'text',
+      variant: 'body',
+      text: localize((language) => notes.map((note) => pick(language, note)).join(' ')),
+    });
+  }
+  return { ttl_seconds: 1800, components: [...components, ...buttons] };
+}
+
+/** One widget: its content, and the Refresh button behind it. */
+function widgetHandlers(service, key, build) {
+  return {
+    async get() {
+      logger.debug(`onWidgetGet <- ${key}`);
+      return build(service);
+    },
+
+    async action(actionKey) {
+      logger.info(`onWidgetAction <- ${key}.${actionKey}`);
+      if (actionKey !== WIDGET_ACTIONS.REFRESH) {
+        throw new Error(`Unknown widget action: ${actionKey}`);
+      }
+      try {
+        const snapshot = await service.refresh();
+        return snapshot ? refreshedMessage(snapshot) : service.lastErrorMessage();
+      } catch (err) {
+        return errorMessage(err);
+      }
+    },
+  };
+}
+
 /**
  * The widget handlers, keyed by manifest key.
  * @param {import('../service.js').Service} service
  */
 export function createWidgets(service) {
   return {
-    [FAMILY_WIDGET]: {
-      async get() {
-        logger.debug(`onWidgetGet <- ${FAMILY_WIDGET}`);
-        return buildFamilyWidget(service);
-      },
-
-      async action(actionKey) {
-        logger.info(`onWidgetAction <- ${FAMILY_WIDGET}.${actionKey}`);
-        if (actionKey !== WIDGET_ACTIONS.REFRESH) {
-          throw new Error(`Unknown widget action: ${actionKey}`);
-        }
-        try {
-          const snapshot = await service.refresh();
-          return snapshot ? refreshedMessage(snapshot) : service.lastErrorMessage();
-        } catch (err) {
-          return errorMessage(err);
-        }
-      },
-    },
+    [FAMILY_WIDGET]: widgetHandlers(service, FAMILY_WIDGET, buildFamilyWidget),
+    [BOOKINGS_WIDGET]: widgetHandlers(service, BOOKINGS_WIDGET, buildBookingsWidget),
   };
 }
 
-/** Ask the core to re-pull the widget now (fire-and-forget, rate-limited). */
+/** Ask the core to re-pull the widgets now (fire-and-forget, rate-limited). */
 export function refreshWidget(gladys) {
   gladys.requestWidgetRefresh(FAMILY_WIDGET);
+  gladys.requestWidgetRefresh(BOOKINGS_WIDGET);
 }

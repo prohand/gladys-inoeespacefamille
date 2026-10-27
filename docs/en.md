@@ -105,6 +105,11 @@ The **Family space** widget (`family_space`) shows the amount due (live), the ne
 and the documents expected. The **Refresh** button reads the portal again; **Open the portal**
 opens your Espace Famille.
 
+The **Upcoming bookings** widget (`upcoming_bookings`) lists the booked days of the coming days
+(the **Planning read ahead (days)** setting), one card per day, at most 8: the children booked and
+their slots, "Today" and "Tomorrow" in colour. Tap a card to see each child's activities in full.
+It has the same **Refresh** and **Open the portal** buttons.
+
 ## Troubleshooting
 
 | Message                                        | What to do                                                                         |
