@@ -6,6 +6,8 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-27
+
 ### Added
 
 - "Upcoming bookings" dashboard widget: the booked days of the planning window, one card per day
@@ -28,5 +30,6 @@ All notable changes to this integration are documented here. The format follows
 - "Test the connection" button on the Configuration screen.
 - English, French, German and Spanish texts and documentation.
 
-[Unreleased]: https://github.com/prohand/gladys-inoeespacefamille/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/prohand/gladys-inoeespacefamille/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/prohand/gladys-inoeespacefamille/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/prohand/gladys-inoeespacefamille/releases/tag/v1.0.0
